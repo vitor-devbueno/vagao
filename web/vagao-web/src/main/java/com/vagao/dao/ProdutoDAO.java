@@ -7,6 +7,8 @@ import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
+import java.sql.Statement;
+import java.sql.Types;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -47,6 +49,40 @@ public class ProdutoDAO {
                 return rs.next() ? mapear(rs) : null;
             }
         }
+    }
+
+    public int inserir(Produto produto) throws SQLException {
+        String sql = "INSERT INTO produto (nome, descricao, preco, estoque, id_categoria) "
+                + "VALUES (?, ?, ?, ?, ?)";
+
+        try (Connection con = ConexaoFactory.getConexao();
+             PreparedStatement stmt = con.prepareStatement(sql, Statement.RETURN_GENERATED_KEYS)) {
+
+            preencherParametros(stmt, produto);
+            stmt.executeUpdate();
+
+            try (ResultSet chaves = stmt.getGeneratedKeys()) {
+                if (chaves.next()) {
+                    return chaves.getInt(1);
+                }
+                throw new SQLException("Nenhuma chave gerada ao inserir produto.");
+            }
+        }
+    }
+
+    private void preencherParametros(PreparedStatement stmt, Produto produto) throws SQLException {
+        stmt.setString(1, produto.getNome());
+
+        String descricao = produto.getDescricao();
+        if (descricao == null || descricao.isEmpty()) {
+            stmt.setNull(2, Types.VARCHAR);
+        } else {
+            stmt.setString(2, descricao);
+        }
+
+        stmt.setBigDecimal(3, produto.getPreco());
+        stmt.setInt(4, produto.getEstoque());
+        stmt.setInt(5, produto.getCategoria().getIdCategoria());
     }
 
     private Produto mapear(ResultSet rs) throws SQLException {
