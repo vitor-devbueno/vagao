@@ -82,12 +82,99 @@
             font-size: 13px;
             margin-bottom: 16px;
         }
-    </style>
+    </style<style>
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    body {
+        min-height: 100vh;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        background: #111;
+        color: #f2f2f2;
+        font-family: Georgia, 'Times New Roman', serif;
+    }
+    .card {
+        background: #a8192e;
+        border: 3px solid #111;
+        box-shadow: 8px 8px 0 #111;
+        padding: 48px 40px;
+        width: 100%;
+        max-width: 380px;
+    }
+    .marca {
+        font-family: 'Courier New', monospace;
+        font-size: 14px;
+        letter-spacing: 6px;
+        text-transform: uppercase;
+        color: #111;
+        margin-bottom: 4px;
+    }
+    h1 {
+        font-size: 34px;
+        font-weight: 900;
+        text-transform: uppercase;
+        line-height: 1.05;
+        color: #111;
+        margin-bottom: 28px;
+    }
+    label {
+        display: block;
+        font-family: 'Courier New', monospace;
+        font-size: 11px;
+        letter-spacing: 2px;
+        text-transform: uppercase;
+        color: #111;
+        margin-top: 18px;
+        margin-bottom: 6px;
+    }
+    input[type="email"], input[type="password"] {
+        width: 100%;
+        padding: 12px;
+        background: #f2f2f2;
+        border: none;
+        font-family: 'Courier New', monospace;
+        font-size: 14px;
+        color: #111;
+        margin-bottom: 0;
+    }
+    button {
+        margin-top: 28px;
+        width: 100%;
+        padding: 14px;
+        background: #111;
+        color: #f2f2f2;
+        border: none;
+        font-family: 'Courier New', monospace;
+        font-weight: bold;
+        text-transform: uppercase;
+        letter-spacing: 3px;
+        cursor: pointer;
+    }
+    button:hover { background: #000; }
+    .erro {
+        background: #111;
+        color: #ff6b6b;
+        padding: 12px;
+        margin-bottom: 16px;
+        font-family: 'Courier New', monospace;
+        font-size: 12px;
+        border-left: 4px solid #ff6b6b;
+    }
+    .aviso {
+        background: #111;
+        color: #8fd98f;
+        padding: 12px;
+        margin-bottom: 16px;
+        font-family: 'Courier New', monospace;
+        font-size: 12px;
+        border-left: 4px solid #8fd98f;
+    }
+</style>>
 </head>
 <body>
     <div class="card">
-        <h1>VAGÃO</h1>
-        <p class="subtitulo">Streetwear</p>
+       <p class="marca">V A G Ã O //</p>
+	<h1>Vista sua<br>Identidade.</h1>
 
         <c:if test="${not empty erro}">
             <div class="erro"><c:out value="${erro}" /></div>
@@ -108,3 +195,4 @@
     </div>
 </body>
 </html>
+
