@@ -6,34 +6,45 @@
     <meta charset="UTF-8">
     <title>VAGÃO — Área Administrativa</title>
     <style>
-        body { margin: 0; background: #111; color: #eee; font-family: Arial, Helvetica, sans-serif; }
-        header {
-            display: flex; justify-content: space-between; align-items: center;
-            padding: 16px 32px; background: #1c1c1c; border-bottom: 1px solid #333;
-        }
-        header h1 { font-size: 18px; letter-spacing: 1px; margin: 0; }
-        header a { color: #e63946; text-decoration: none; font-size: 13px; }
-        main { padding: 32px; max-width: 640px; margin: 0 auto; }
-        ul { list-style: none; padding: 0; }
-        li { margin-bottom: 12px; }
-        li a {
-            display: block; padding: 14px 16px; background: #1c1c1c; border: 1px solid #333;
-            border-radius: 6px; color: #ccc; text-decoration: none;
-        }
-        li a:hover { border-color: #e63946; }
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    body { background: #111; color: #f2f2f2; font-family: Georgia, 'Times New Roman', serif; min-height: 100vh; }
+    .topo { display: flex; flex-wrap: wrap; gap: 16px; justify-content: space-between; align-items: center;
+            background: #a8192e; border-bottom: 3px solid #111; padding: 16px 32px; }
+    .topo .marca { font-family: 'Courier New', monospace; letter-spacing: 6px; text-transform: uppercase; color: #111; font-weight: bold; }
+    .topo nav a { font-family: 'Courier New', monospace; font-size: 12px; letter-spacing: 2px; text-transform: uppercase;
+                  color: #111; text-decoration: none; margin-left: 18px; }
+    .topo nav a:hover, .topo nav a.ativo { text-decoration: underline; }
+    main { max-width: 1000px; margin: 0 auto; padding: 40px 16px; }
+    h1 { font-size: 32px; font-weight: 900; text-transform: uppercase; margin-bottom: 8px; }
+    .saudacao { font-family: 'Courier New', monospace; font-size: 13px; color: #ccc; margin-bottom: 32px; }
+    ul { list-style: none; }
+    li { margin-bottom: 12px; }
+    li a {
+        display: block; padding: 18px 20px; background: #1a1a1a; border: 3px solid #a8192e;
+        box-shadow: 8px 8px 0 #a8192e; color: #f2f2f2; text-decoration: none;
+        font-family: 'Courier New', monospace; letter-spacing: 2px; text-transform: uppercase; font-size: 13px;
+    }
+    li a:hover { background: #222; }
     </style>
 </head>
 <body>
-    <header>
-        <h1>VAGÃO — Administração</h1>
+    <header class="topo">
+      <span class="marca">V A G Ã O // admin</span>
+      <nav>
+        <a href="${pageContext.request.contextPath}/admin/painel.jsp" class="ativo">Painel</a>
+        <a href="${pageContext.request.contextPath}/admin/produtos">Produtos</a>
+        <a href="${pageContext.request.contextPath}/admin/categorias">Categorias</a>
+        <a href="${pageContext.request.contextPath}/admin/pedidos">Pedidos</a>
         <a href="${pageContext.request.contextPath}/logout">Sair</a>
+      </nav>
     </header>
     <main>
-        <p>Olá, <c:out value="${usuarioLogado.nome}" />. Bem-vindo(a) à área administrativa.</p>
+        <h1>Área administrativa</h1>
+        <p class="saudacao">Olá, <c:out value="${usuarioLogado.nome}" />.</p>
         <ul>
-            <li><a href="#">Produtos (em breve)</a></li>
-            <li><a href="#">Categorias (em breve)</a></li>
-            <li><a href="#">Pedidos (em breve)</a></li>
+            <li><a href="${pageContext.request.contextPath}/admin/produtos">Produtos</a></li>
+            <li><a href="${pageContext.request.contextPath}/admin/categorias">Categorias</a></li>
+            <li><a href="${pageContext.request.contextPath}/admin/pedidos">Pedidos</a></li>
         </ul>
     </main>
 </body>
