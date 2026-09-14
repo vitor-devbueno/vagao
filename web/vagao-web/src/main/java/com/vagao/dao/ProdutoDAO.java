@@ -70,6 +70,20 @@ public class ProdutoDAO {
         }
     }
 
+    public boolean atualizar(Produto produto) throws SQLException {
+        String sql = "UPDATE produto SET nome = ?, descricao = ?, preco = ?, estoque = ?, "
+                + "id_categoria = ? WHERE id_produto = ?";
+
+        try (Connection con = ConexaoFactory.getConexao();
+             PreparedStatement stmt = con.prepareStatement(sql)) {
+
+            preencherParametros(stmt, produto);
+            stmt.setInt(6, produto.getIdProduto());
+
+            return stmt.executeUpdate() == 1;
+        }
+    }
+
     private void preencherParametros(PreparedStatement stmt, Produto produto) throws SQLException {
         stmt.setString(1, produto.getNome());
 

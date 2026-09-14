@@ -51,6 +51,8 @@ public class ProdutoServlet extends HttpServlet {
                 listar(request, response);
             } else if (pathInfo.equals("/novo")) {
                 exibirFormularioNovo(request, response);
+            } else if (pathInfo.equals("/editar")) {
+                exibirFormularioEditar(request, response);
             } else {
                 response.sendError(HttpServletResponse.SC_NOT_FOUND);
             }
@@ -95,6 +97,46 @@ public class ProdutoServlet extends HttpServlet {
         request.getRequestDispatcher(VIEW_FORM).forward(request, response);
     }
 
+    private void exibirFormularioEditar(HttpServletRequest request, HttpServletResponse response)
+            throws SQLException, ServletException, IOException {
+
+        Integer id = lerId(request.getParameter("id"));
+        if (id == null) {
+            response.sendError(HttpServletResponse.SC_NOT_FOUND);
+            return;
+        }
+
+        Produto produto = produtoDAO.buscarPorId(id);
+        if (produto == null) {
+            response.sendError(HttpServletResponse.SC_NOT_FOUND);
+            return;
+        }
+
+        Map<String, String> campos = new LinkedHashMap<>();
+        campos.put("id", String.valueOf(produto.getIdProduto()));
+        campos.put("nome", produto.getNome());
+        campos.put("descricao", produto.getDescricao() == null ? "" : produto.getDescricao());
+        campos.put("preco", produto.getPreco().toPlainString());
+        campos.put("estoque", String.valueOf(produto.getEstoque()));
+        campos.put("idCategoria", String.valueOf(produto.getCategoria().getIdCategoria()));
+
+        request.setAttribute("titulo", "Editar produto");
+        request.setAttribute("campos", campos);
+        request.setAttribute("categorias", categoriaDAO.listarTodas());
+        request.getRequestDispatcher(VIEW_FORM).forward(request, response);
+    }
+
+    private Integer lerId(String valor) {
+        if (valor == null || valor.isEmpty()) {
+            return null;
+        }
+        try {
+            return Integer.parseInt(valor);
+        } catch (NumberFormatException e) {
+            return null;
+        }
+    }
+
     private void salvar(HttpServletRequest request, HttpServletResponse response)
             throws SQLException, ServletException, IOException {
 
@@ -136,8 +178,17 @@ public class ProdutoServlet extends HttpServlet {
         produto.setEstoque(estoque);
         produto.setCategoria(categoria);
 
-        produtoDAO.inserir(produto);
-        Flash.sucesso(request, "Produto cadastrado com sucesso.");
+        if (idAtual == 0) {
+            produtoDAO.inserir(produto);
+            Flash.sucesso(request, "Produto cadastrado com sucesso.");
+        } else {
+            produto.setIdProduto(idAtual);
+            if (!produtoDAO.atualizar(produto)) {
+                response.sendError(HttpServletResponse.SC_NOT_FOUND);
+                return;
+            }
+            Flash.sucesso(request, "Produto atualizado com sucesso.");
+        }
 
         response.sendRedirect(request.getContextPath() + "/admin/produtos");
     }
