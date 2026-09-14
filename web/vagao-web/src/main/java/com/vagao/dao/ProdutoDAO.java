@@ -84,6 +84,31 @@ public class ProdutoDAO {
         }
     }
 
+    public boolean excluir(int id) throws SQLException {
+        String sql = "DELETE FROM produto WHERE id_produto = ?";
+
+        try (Connection con = ConexaoFactory.getConexao();
+             PreparedStatement stmt = con.prepareStatement(sql)) {
+
+            stmt.setInt(1, id);
+            return stmt.executeUpdate() == 1;
+        }
+    }
+
+    public boolean possuiPedidos(int idProduto) throws SQLException {
+        String sql = "SELECT 1 FROM item_pedido WHERE id_produto = ? LIMIT 1";
+
+        try (Connection con = ConexaoFactory.getConexao();
+             PreparedStatement stmt = con.prepareStatement(sql)) {
+
+            stmt.setInt(1, idProduto);
+
+            try (ResultSet rs = stmt.executeQuery()) {
+                return rs.next();
+            }
+        }
+    }
+
     private void preencherParametros(PreparedStatement stmt, Produto produto) throws SQLException {
         stmt.setString(1, produto.getNome());
 

@@ -15,6 +15,7 @@ import java.io.IOException;
 import java.math.BigDecimal;
 import java.math.RoundingMode;
 import java.sql.SQLException;
+import java.sql.SQLIntegrityConstraintViolationException;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
@@ -35,6 +36,7 @@ public class ProdutoServlet extends HttpServlet {
 
     private static final String VIEW_LISTA = "/WEB-INF/views/admin/produto/lista.jsp";
     private static final String VIEW_FORM = "/WEB-INF/views/admin/produto/form.jsp";
+    private static final String VIEW_CONFIRMAR_EXCLUSAO = "/WEB-INF/views/admin/confirmar-exclusao.jsp";
 
     private final ProdutoDAO produtoDAO = new ProdutoDAO();
     private final CategoriaDAO categoriaDAO = new CategoriaDAO();
@@ -53,6 +55,8 @@ public class ProdutoServlet extends HttpServlet {
                 exibirFormularioNovo(request, response);
             } else if (pathInfo.equals("/editar")) {
                 exibirFormularioEditar(request, response);
+            } else if (pathInfo.equals("/excluir")) {
+                exibirConfirmacaoExclusao(request, response);
             } else {
                 response.sendError(HttpServletResponse.SC_NOT_FOUND);
             }
@@ -72,6 +76,8 @@ public class ProdutoServlet extends HttpServlet {
         try {
             if ("/salvar".equals(pathInfo)) {
                 salvar(request, response);
+            } else if ("/excluir".equals(pathInfo)) {
+                excluir(request, response);
             } else {
                 response.sendError(HttpServletResponse.SC_NOT_FOUND);
             }
@@ -124,6 +130,59 @@ public class ProdutoServlet extends HttpServlet {
         request.setAttribute("campos", campos);
         request.setAttribute("categorias", categoriaDAO.listarTodas());
         request.getRequestDispatcher(VIEW_FORM).forward(request, response);
+    }
+
+    private void exibirConfirmacaoExclusao(HttpServletRequest request, HttpServletResponse response)
+            throws SQLException, ServletException, IOException {
+
+        Integer id = lerId(request.getParameter("id"));
+        if (id == null) {
+            response.sendError(HttpServletResponse.SC_NOT_FOUND);
+            return;
+        }
+
+        Produto produto = produtoDAO.buscarPorId(id);
+        if (produto == null) {
+            response.sendError(HttpServletResponse.SC_NOT_FOUND);
+            return;
+        }
+
+        request.setAttribute("tipo", "produto");
+        request.setAttribute("nomeItem", produto.getNome());
+        request.setAttribute("id", produto.getIdProduto());
+        request.setAttribute("acaoUrl", request.getContextPath() + "/admin/produtos/excluir");
+        request.setAttribute("voltarUrl", request.getContextPath() + "/admin/produtos");
+        request.getRequestDispatcher(VIEW_CONFIRMAR_EXCLUSAO).forward(request, response);
+    }
+
+    private void excluir(HttpServletRequest request, HttpServletResponse response)
+            throws SQLException, IOException {
+
+        Integer id = lerId(request.getParameter("id"));
+        if (id == null) {
+            response.sendError(HttpServletResponse.SC_NOT_FOUND);
+            return;
+        }
+
+        if (produtoDAO.possuiPedidos(id)) {
+            Flash.erro(request, "Produto possui pedidos e não pode ser excluído. "
+                    + "Zere o estoque para retirá-lo de venda.");
+        } else {
+            try {
+                if (produtoDAO.excluir(id)) {
+                    Flash.sucesso(request, "Produto excluído com sucesso.");
+                } else {
+                    response.sendError(HttpServletResponse.SC_NOT_FOUND);
+                    return;
+                }
+            } catch (SQLIntegrityConstraintViolationException e) {
+                LOGGER.log(Level.WARNING, "Falha ao excluir produto " + id, e);
+                Flash.erro(request, "Produto possui pedidos e não pode ser excluído. "
+                        + "Zere o estoque para retirá-lo de venda.");
+            }
+        }
+
+        response.sendRedirect(request.getContextPath() + "/admin/produtos");
     }
 
     private Integer lerId(String valor) {
