@@ -108,7 +108,8 @@ public final class JsonUtil {
 
     /**
      * Serializa o produto completo. Campos: idProduto, nome, descricao (ou null),
-     * preco (String, 2 casas), estoque, categoria (aninhada ou null).
+     * preco (String, 2 casas), estoque, categoria (aninhada ou null), imagemUrl
+     * (caminho relativo já versionado com ?v=, ou null quando não há foto).
      */
     public static JSONObject produtoParaJson(Produto produto) {
         JSONObject json = new JSONObject();
@@ -119,6 +120,9 @@ public final class JsonUtil {
         json.put("estoque", produto.getEstoque());
         json.put("categoria", produto.getCategoria() != null
                 ? categoriaParaJson(produto.getCategoria())
+                : JSONObject.NULL);
+        json.put("imagemUrl", produto.isTemImagem()
+                ? "/imagens/produtos/" + produto.getIdProduto() + "?v=" + produto.getImagemVersao()
                 : JSONObject.NULL);
         return json;
     }
