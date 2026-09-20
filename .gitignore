@@ -28,3 +28,6 @@ target/
 
 # Configuração local de banco (contém credenciais)
 web/vagao-web/src/main/resources/db.properties
+
+# O Flutter versiona o wrapper do Gradle; a regra *.jar acima o excluiria.
+!mobile/**/gradle/wrapper/gradle-wrapper.jar
