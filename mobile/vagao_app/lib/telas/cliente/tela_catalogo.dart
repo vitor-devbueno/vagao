@@ -155,11 +155,16 @@ class _TelaCatalogoState extends State<TelaCatalogo> {
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.stretch,
           children: [
-            ThumbProduto(iniciais: produto.iniciais),
+            // Expanded (em vez do quadrado 1:1 direto) absorve o espaço
+            // sobrando depois do bloco de texto abaixo, que tem altura
+            // variável (nome pode quebrar em 2 linhas) — evita overflow
+            // no grid, cujas células têm altura fixa (childAspectRatio).
+            Expanded(child: ThumbProduto(iniciais: produto.iniciais)),
             Padding(
               padding: const EdgeInsets.all(12),
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
+                mainAxisSize: MainAxisSize.min,
                 children: [
                   Text(
                     produto.nome.toUpperCase(),
