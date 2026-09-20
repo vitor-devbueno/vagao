@@ -11,7 +11,9 @@ import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Statement;
 import java.util.ArrayList;
+import java.util.LinkedHashMap;
 import java.util.List;
+import java.util.Map;
 
 /**
  * Acesso a dados das tabelas `pedido` e `item_pedido`.
@@ -219,6 +221,27 @@ public class PedidoDAO {
 
             return stmt.executeUpdate() == 1;
         }
+    }
+
+    /**
+     * Conta os pedidos agrupados por status, para o painel do administrador (RF20).
+     * Devolve só os status presentes no banco; preencher os ausentes é
+     * responsabilidade de quem consome (a API completa com zero).
+     */
+    public Map<String, Integer> contarPorStatus() throws SQLException {
+        String sql = "SELECT status, COUNT(*) AS quantidade FROM pedido GROUP BY status";
+
+        Map<String, Integer> contagem = new LinkedHashMap<>();
+
+        try (Connection con = ConexaoFactory.getConexao();
+             PreparedStatement stmt = con.prepareStatement(sql);
+             ResultSet rs = stmt.executeQuery()) {
+
+            while (rs.next()) {
+                contagem.put(rs.getString("status"), rs.getInt("quantidade"));
+            }
+        }
+        return contagem;
     }
 
     private Pedido mapearCabecalho(ResultSet rs) throws SQLException {
