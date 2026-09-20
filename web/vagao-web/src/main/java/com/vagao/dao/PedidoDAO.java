@@ -9,6 +9,7 @@ import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
+import java.sql.Statement;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -140,6 +141,70 @@ public class PedidoDAO {
             }
 
             return pedido;
+        }
+    }
+
+    /**
+     * Cria o pedido, seus itens e baixa o estoque em uma única transação.
+     * Qualquer falha desfaz tudo.
+     */
+    public int inserir(Pedido pedido) throws SQLException, EstoqueInsuficienteException {
+        String sqlPedido = "INSERT INTO pedido (status, id_usuario) VALUES (?, ?)";
+        String sqlBaixaEstoque = "UPDATE produto SET estoque = estoque - ? WHERE id_produto = ? AND estoque >= ?";
+        String sqlItem = "INSERT INTO item_pedido (quantidade, preco_unitario, id_pedido, id_produto) "
+                + "VALUES (?, ?, ?, ?)";
+
+        try (Connection con = ConexaoFactory.getConexao()) {
+            con.setAutoCommit(false);
+
+            try {
+                int idPedido;
+                try (PreparedStatement stmt = con.prepareStatement(sqlPedido, Statement.RETURN_GENERATED_KEYS)) {
+                    stmt.setString(1, pedido.getStatus());
+                    stmt.setInt(2, pedido.getCliente().getIdUsuario());
+                    stmt.executeUpdate();
+
+                    try (ResultSet chaves = stmt.getGeneratedKeys()) {
+                        if (chaves.next()) {
+                            idPedido = chaves.getInt(1);
+                        } else {
+                            throw new SQLException("Nenhuma chave gerada ao inserir pedido.");
+                        }
+                    }
+                }
+
+                for (ItemPedido item : pedido.getItens()) {
+                    int idProduto = item.getProduto().getIdProduto();
+                    int quantidade = item.getQuantidade();
+
+                    try (PreparedStatement stmt = con.prepareStatement(sqlBaixaEstoque)) {
+                        stmt.setInt(1, quantidade);
+                        stmt.setInt(2, idProduto);
+                        stmt.setInt(3, quantidade);
+
+                        if (stmt.executeUpdate() == 0) {
+                            throw new EstoqueInsuficienteException(
+                                    "Estoque insuficiente para o produto " + idProduto + ".");
+                        }
+                    }
+
+                    try (PreparedStatement stmt = con.prepareStatement(sqlItem)) {
+                        stmt.setInt(1, quantidade);
+                        stmt.setBigDecimal(2, item.getPrecoUnitario());
+                        stmt.setInt(3, idPedido);
+                        stmt.setInt(4, idProduto);
+                        stmt.executeUpdate();
+                    }
+                }
+
+                con.commit();
+                return idPedido;
+            } catch (SQLException | EstoqueInsuficienteException e) {
+                con.rollback();
+                throw e;
+            } finally {
+                con.setAutoCommit(true);
+            }
         }
     }
 

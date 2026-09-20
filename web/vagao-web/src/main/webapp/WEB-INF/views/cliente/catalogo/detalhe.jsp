@@ -37,6 +37,13 @@
     .estoque { font-family: 'Courier New', monospace; font-size: 13px; margin-bottom: 16px; }
     .esgotado { font-family: 'Courier New', monospace; font-size: 13px; color: #ff6b6b;
                 border-left: 4px solid #ff6b6b; padding: 8px 12px; background: #1a1a1a; }
+    .form-compra { display: flex; align-items: center; flex-wrap: wrap; gap: 8px; margin-top: 8px; }
+    .form-compra input[type="number"] { padding: 12px; background: #f2f2f2; color: #111; border: none;
+                                         font-family: 'Courier New', monospace; font-size: 14px; width: 80px; }
+    .btn { display: inline-block; font-family: 'Courier New', monospace; font-size: 12px; font-weight: bold; letter-spacing: 2px;
+           text-transform: uppercase; text-decoration: none; border: none; cursor: pointer; padding: 10px 16px;
+           background: #a8192e; color: #f2f2f2; box-shadow: 4px 4px 0 #f2f2f2; }
+    .btn:hover { background: #8a1426; }
     </style>
 </head>
 <body>
@@ -72,6 +79,12 @@
                 <c:choose>
                     <c:when test="${produto.estoque > 0}">
                         <p class="estoque"><span class="label">Estoque:</span> ${produto.estoque} unidade(s) disponível(is)</p>
+                        <form method="post" action="${pageContext.request.contextPath}/cliente/pedidos/novo" class="form-compra">
+                            <input type="hidden" name="idProduto" value="${produto.idProduto}">
+                            <label for="quantidade">Quantidade:</label>
+                            <input type="number" id="quantidade" name="quantidade" value="1" min="1" max="${produto.estoque}" required>
+                            <button type="submit" class="btn">Comprar</button>
+                        </form>
                     </c:when>
                     <c:otherwise>
                         <p class="esgotado">Produto esgotado</p>
