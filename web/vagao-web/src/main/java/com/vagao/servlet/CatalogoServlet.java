@@ -1,6 +1,7 @@
 package com.vagao.servlet;
 
 import com.vagao.dao.ProdutoDAO;
+import com.vagao.entidade.Produto;
 import com.vagao.util.Flash;
 
 import javax.servlet.ServletException;
@@ -24,6 +25,7 @@ public class CatalogoServlet extends HttpServlet {
     private static final Logger LOGGER = Logger.getLogger(CatalogoServlet.class.getName());
 
     private static final String VIEW_LISTA = "/WEB-INF/views/cliente/catalogo/lista.jsp";
+    private static final String VIEW_DETALHE = "/WEB-INF/views/cliente/catalogo/detalhe.jsp";
 
     private final ProdutoDAO produtoDAO = new ProdutoDAO();
 
@@ -37,6 +39,8 @@ public class CatalogoServlet extends HttpServlet {
         try {
             if (pathInfo == null || pathInfo.equals("/")) {
                 listar(request, response);
+            } else if (pathInfo.equals("/detalhe")) {
+                exibirDetalhe(request, response);
             } else {
                 response.sendError(HttpServletResponse.SC_NOT_FOUND);
             }
@@ -51,6 +55,25 @@ public class CatalogoServlet extends HttpServlet {
 
         request.setAttribute("produtos", produtoDAO.listarDisponiveis());
         request.getRequestDispatcher(VIEW_LISTA).forward(request, response);
+    }
+
+    private void exibirDetalhe(HttpServletRequest request, HttpServletResponse response)
+            throws SQLException, ServletException, IOException {
+
+        Integer id = lerId(request.getParameter("id"));
+        if (id == null) {
+            response.sendError(HttpServletResponse.SC_NOT_FOUND);
+            return;
+        }
+
+        Produto produto = produtoDAO.buscarPorId(id);
+        if (produto == null) {
+            response.sendError(HttpServletResponse.SC_NOT_FOUND);
+            return;
+        }
+
+        request.setAttribute("produto", produto);
+        request.getRequestDispatcher(VIEW_DETALHE).forward(request, response);
     }
 
     private Integer lerId(String valor) {
