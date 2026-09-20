@@ -42,3 +42,15 @@ CREATE TABLE item_pedido (
   FOREIGN KEY (id_pedido) REFERENCES pedido(id_pedido),
   FOREIGN KEY (id_produto) REFERENCES produto(id_produto)
 );
+
+-- Foto do produto: tabela separada (BLOB), não coluna em `produto` nem
+-- arquivo em disco. Ver docs/documento3-secao3-classes.md para a justificativa.
+CREATE TABLE produto_imagem (
+  id_produto    INT PRIMARY KEY,
+  mime          VARCHAR(40)  NOT NULL,
+  conteudo      LONGBLOB     NOT NULL,
+  atualizado_em TIMESTAMP    NOT NULL DEFAULT CURRENT_TIMESTAMP
+                             ON UPDATE CURRENT_TIMESTAMP,
+  CONSTRAINT fk_produto_imagem_produto FOREIGN KEY (id_produto)
+    REFERENCES produto(id_produto) ON DELETE CASCADE
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
