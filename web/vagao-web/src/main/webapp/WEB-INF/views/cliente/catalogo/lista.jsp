@@ -61,7 +61,7 @@
                 <div class="grade">
                     <c:forEach var="p" items="${produtos}">
                         <a class="card" href="${pageContext.request.contextPath}/cliente/catalogo/detalhe?id=${p.idProduto}">
-                            <div class="thumb">${fn:toUpperCase(fn:substring(p.nome, 0, 2))}</div>
+                            <div class="thumb"><c:out value="${fn:toUpperCase(fn:substring(p.nome, 0, 2))}" /></div>
                             <div class="corpo">
                                 <h2><c:out value="${p.nome}" /></h2>
                                 <div class="categoria"><c:out value="${p.categoria.nome}" /></div>

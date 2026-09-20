@@ -64,7 +64,7 @@
         </c:if>
 
         <div class="detalhe">
-            <div class="thumb">${fn:toUpperCase(fn:substring(produto.nome, 0, 2))}</div>
+            <div class="thumb"><c:out value="${fn:toUpperCase(fn:substring(produto.nome, 0, 2))}" /></div>
             <div>
                 <h1><c:out value="${produto.nome}" /></h1>
                 <div class="categoria"><c:out value="${produto.categoria.nome}" /></div>
