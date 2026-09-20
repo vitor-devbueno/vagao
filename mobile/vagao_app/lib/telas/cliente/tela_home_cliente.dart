@@ -2,10 +2,12 @@ import 'package:flutter/material.dart';
 
 import '../../servicos/servico_autenticacao.dart';
 import '../../tema/tema_vagao.dart';
+import '../../widgets/card_vagao.dart';
+import 'tela_catalogo.dart';
+import 'tela_meus_pedidos.dart';
 
-/// Home estática do perfil cliente. Sem dados reais e sem chamadas à API
-/// de catálogo/pedidos — isso é Semana 6. Aqui só se prova a navegação
-/// por perfil (RF16).
+/// Home do perfil cliente. Navega para o catálogo real e para os próprios
+/// pedidos (RF17/RF19) — as duas entregas da Semana 6 para este perfil.
 class TelaHomeCliente extends StatelessWidget {
   const TelaHomeCliente({super.key});
 
@@ -39,48 +41,23 @@ class TelaHomeCliente extends StatelessWidget {
               style: TemaVagao.titulo,
             ),
             const SizedBox(height: 24),
-            const _CardEstatico(titulo: 'Catálogo'),
+            CardVagao(
+              titulo: 'Catálogo',
+              subtitulo: 'Ver produtos disponíveis',
+              onTap: () => Navigator.of(context).push(
+                MaterialPageRoute(builder: (_) => const TelaCatalogo()),
+              ),
+            ),
             const SizedBox(height: 16),
-            const _CardEstatico(titulo: 'Meus pedidos'),
+            CardVagao(
+              titulo: 'Meus pedidos',
+              subtitulo: 'Acompanhar pedidos realizados',
+              onTap: () => Navigator.of(context).push(
+                MaterialPageRoute(builder: (_) => const TelaMeusPedidos()),
+              ),
+            ),
           ],
         ),
-      ),
-    );
-  }
-}
-
-class _CardEstatico extends StatelessWidget {
-  final String titulo;
-
-  const _CardEstatico({required this.titulo});
-
-  @override
-  Widget build(BuildContext context) {
-    return Container(
-      width: double.infinity,
-      padding: const EdgeInsets.all(20),
-      decoration: BoxDecoration(
-        color: TemaVagao.painel,
-        border: Border.all(color: TemaVagao.vermelho, width: 2),
-        boxShadow: TemaVagao.sombraDura,
-      ),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          Text(
-            titulo.toUpperCase(),
-            style: const TextStyle(
-              color: TemaVagao.claro,
-              fontWeight: FontWeight.bold,
-              letterSpacing: 2,
-            ),
-          ),
-          const SizedBox(height: 8),
-          const Text(
-            'Disponível na próxima entrega',
-            style: TemaVagao.label,
-          ),
-        ],
       ),
     );
   }
