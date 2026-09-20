@@ -10,8 +10,8 @@ import javax.servlet.http.HttpSession;
 import java.io.IOException;
 
 /**
- * Protege tudo em /cliente/*: exige apenas usuário autenticado
- * (admin também pode acessar a área do cliente).
+ * Protege tudo em /cliente/*: exige usuário logado com perfil "cliente".
+ * Um administrador logado recebe 403 ao tentar acessar a área do cliente.
  */
 @WebFilter("/cliente/*")
 public class ClienteFilter implements Filter {
@@ -35,6 +35,11 @@ public class ClienteFilter implements Filter {
 
         if (usuarioLogado == null) {
             response.sendRedirect(request.getContextPath() + "/login");
+            return;
+        }
+
+        if (!usuarioLogado.isCliente()) {
+            response.sendError(HttpServletResponse.SC_FORBIDDEN, "Acesso restrito a clientes.");
             return;
         }
 
