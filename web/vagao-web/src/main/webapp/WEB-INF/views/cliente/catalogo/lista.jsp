@@ -29,6 +29,7 @@
     .thumb { aspect-ratio: 1 / 1; background: #a8192e; color: #111;
              display: flex; align-items: center; justify-content: center;
              font-family: 'Courier New', monospace; font-size: 40px; font-weight: bold; letter-spacing: 6px; }
+    .thumb-img { aspect-ratio: 1 / 1; width: 100%; object-fit: cover; display: block; }
     .card .corpo { padding: 16px; }
     .card h2 { font-size: 18px; text-transform: uppercase; margin-bottom: 8px; }
     .card .categoria { font-family: 'Courier New', monospace; font-size: 11px;
@@ -61,7 +62,16 @@
                 <div class="grade">
                     <c:forEach var="p" items="${produtos}">
                         <a class="card" href="${pageContext.request.contextPath}/cliente/catalogo/detalhe?id=${p.idProduto}">
-                            <div class="thumb"><c:out value="${fn:toUpperCase(fn:substring(p.nome, 0, 2))}" /></div>
+                            <c:choose>
+                                <c:when test="${p.temImagem}">
+                                    <img class="thumb-img"
+                                         src="${pageContext.request.contextPath}/imagens/produtos/${p.idProduto}?v=${p.imagemVersao}"
+                                         alt="<c:out value='${p.nome}' />">
+                                </c:when>
+                                <c:otherwise>
+                                    <div class="thumb"><c:out value="${fn:toUpperCase(fn:substring(p.nome, 0, 2))}" /></div>
+                                </c:otherwise>
+                            </c:choose>
                             <div class="corpo">
                                 <h2><c:out value="${p.nome}" /></h2>
                                 <div class="categoria"><c:out value="${p.categoria.nome}" /></div>

@@ -30,6 +30,7 @@
              display: flex; align-items: center; justify-content: center;
              font-family: 'Courier New', monospace; font-size: 64px; font-weight: bold; letter-spacing: 6px;
              box-shadow: 8px 8px 0 #1a1a1a; }
+    .thumb-img { aspect-ratio: 1 / 1; width: 100%; object-fit: cover; display: block; box-shadow: 8px 8px 0 #1a1a1a; }
     .categoria { font-family: 'Courier New', monospace; font-size: 12px;
                  letter-spacing: 2px; text-transform: uppercase; color: #a8192e; margin-bottom: 16px; }
     .preco { font-family: 'Courier New', monospace; font-size: 28px; margin-bottom: 16px; }
@@ -64,7 +65,16 @@
         </c:if>
 
         <div class="detalhe">
-            <div class="thumb"><c:out value="${fn:toUpperCase(fn:substring(produto.nome, 0, 2))}" /></div>
+            <c:choose>
+                <c:when test="${produto.temImagem}">
+                    <img class="thumb-img"
+                         src="${pageContext.request.contextPath}/imagens/produtos/${produto.idProduto}?v=${produto.imagemVersao}"
+                         alt="<c:out value='${produto.nome}' />">
+                </c:when>
+                <c:otherwise>
+                    <div class="thumb"><c:out value="${fn:toUpperCase(fn:substring(produto.nome, 0, 2))}" /></div>
+                </c:otherwise>
+            </c:choose>
             <div>
                 <h1><c:out value="${produto.nome}" /></h1>
                 <div class="categoria"><c:out value="${produto.categoria.nome}" /></div>
