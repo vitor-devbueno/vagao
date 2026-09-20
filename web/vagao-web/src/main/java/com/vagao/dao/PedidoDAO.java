@@ -51,6 +51,28 @@ public class PedidoDAO {
         return pedidos;
     }
 
+    public List<Pedido> listarPorUsuario(int idUsuario) throws SQLException {
+        String sql = SELECT_CABECALHO
+                + " WHERE pe.id_usuario = ? "
+                + "GROUP BY pe.id_pedido, pe.data_pedido, pe.status, u.id_usuario, u.nome, u.email "
+                + "ORDER BY pe.data_pedido DESC";
+
+        List<Pedido> pedidos = new ArrayList<>();
+
+        try (Connection con = ConexaoFactory.getConexao();
+             PreparedStatement stmt = con.prepareStatement(sql)) {
+
+            stmt.setInt(1, idUsuario);
+
+            try (ResultSet rs = stmt.executeQuery()) {
+                while (rs.next()) {
+                    pedidos.add(mapearCabecalho(rs));
+                }
+            }
+        }
+        return pedidos;
+    }
+
     public Pedido buscarPorId(int id) throws SQLException {
         String sql = SELECT_CABECALHO
                 + " WHERE pe.id_pedido = ? "
@@ -71,6 +93,43 @@ public class PedidoDAO {
 
             try (PreparedStatement stmt = con.prepareStatement(SELECT_ITENS)) {
                 stmt.setInt(1, id);
+                try (ResultSet rs = stmt.executeQuery()) {
+                    List<ItemPedido> itens = new ArrayList<>();
+                    while (rs.next()) {
+                        itens.add(mapearItem(rs));
+                    }
+                    pedido.setItens(itens);
+                }
+            }
+
+            return pedido;
+        }
+    }
+
+    /**
+     * Filtra por dono no próprio SQL: um cliente nunca recebe o pedido de outro (RF14).
+     */
+    public Pedido buscarPorIdEUsuario(int idPedido, int idUsuario) throws SQLException {
+        String sql = SELECT_CABECALHO
+                + " WHERE pe.id_pedido = ? AND pe.id_usuario = ? "
+                + "GROUP BY pe.id_pedido, pe.data_pedido, pe.status, u.id_usuario, u.nome, u.email";
+
+        try (Connection con = ConexaoFactory.getConexao()) {
+            Pedido pedido;
+
+            try (PreparedStatement stmt = con.prepareStatement(sql)) {
+                stmt.setInt(1, idPedido);
+                stmt.setInt(2, idUsuario);
+                try (ResultSet rs = stmt.executeQuery()) {
+                    if (!rs.next()) {
+                        return null;
+                    }
+                    pedido = mapearCabecalho(rs);
+                }
+            }
+
+            try (PreparedStatement stmt = con.prepareStatement(SELECT_ITENS)) {
+                stmt.setInt(1, idPedido);
                 try (ResultSet rs = stmt.executeQuery()) {
                     List<ItemPedido> itens = new ArrayList<>();
                     while (rs.next()) {
