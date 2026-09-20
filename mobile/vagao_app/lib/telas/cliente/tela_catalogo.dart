@@ -159,7 +159,12 @@ class _TelaCatalogoState extends State<TelaCatalogo> {
             // sobrando depois do bloco de texto abaixo, que tem altura
             // variável (nome pode quebrar em 2 linhas) — evita overflow
             // no grid, cujas células têm altura fixa (childAspectRatio).
-            Expanded(child: ThumbProduto(iniciais: produto.iniciais)),
+            Expanded(
+              child: ThumbProduto(
+                iniciais: produto.iniciais,
+                imagemUrl: produto.imagemUrl,
+              ),
+            ),
             Padding(
               padding: const EdgeInsets.all(12),
               child: Column(

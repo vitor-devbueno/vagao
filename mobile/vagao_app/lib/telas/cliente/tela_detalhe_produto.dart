@@ -96,7 +96,11 @@ class _TelaDetalheProdutoState extends State<TelaDetalheProduto> {
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          ThumbProduto(iniciais: produto.iniciais, tamanhoFonte: 64),
+          ThumbProduto(
+            iniciais: produto.iniciais,
+            tamanhoFonte: 64,
+            imagemUrl: produto.imagemUrl,
+          ),
           const SizedBox(height: 24),
           Text(produto.nome, style: TemaVagao.titulo.copyWith(fontSize: 24)),
           const SizedBox(height: 8),

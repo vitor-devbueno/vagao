@@ -8,6 +8,7 @@ class Produto {
   final double preco;
   final int estoque;
   final Categoria? categoria;
+  final String? imagemUrl;
 
   Produto({
     required this.idProduto,
@@ -16,6 +17,7 @@ class Produto {
     required this.preco,
     required this.estoque,
     this.categoria,
+    this.imagemUrl,
   });
 
   factory Produto.fromJson(Map<String, dynamic> json) {
@@ -31,6 +33,9 @@ class Produto {
       categoria: json['categoria'] != null
           ? Categoria.fromJson(json['categoria'] as Map<String, dynamic>)
           : null,
+      // Caminho relativo já versionado (?v=...) ou null quando não há foto —
+      // o placeholder de iniciais é o fallback (ThumbProduto).
+      imagemUrl: json['imagemUrl'] as String?,
     );
   }
 
