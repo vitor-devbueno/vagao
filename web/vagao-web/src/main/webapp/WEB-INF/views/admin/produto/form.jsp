@@ -26,11 +26,19 @@
     .btn-sec { background: #f2f2f2; color: #111; box-shadow: 4px 4px 0 #a8192e; }
     input[type=text], input[type=number], textarea, select { width: 100%; padding: 12px; background: #f2f2f2; color: #111; border: none;
            font-family: 'Courier New', monospace; font-size: 14px; margin: 6px 0 4px; }
+    input[type=file] { width: 100%; padding: 10px 0; color: #f2f2f2; font-family: 'Courier New', monospace; font-size: 13px; margin: 6px 0 4px; }
     textarea { resize: vertical; min-height: 72px; font-family: 'Courier New', monospace; }
     .campo { margin-bottom: 18px; }
     .erro-campo { color: #ff6b6b; font-family: 'Courier New', monospace; font-size: 12px; }
+    .ajuda-campo { color: #999; font-family: 'Courier New', monospace; font-size: 11px; margin-top: 4px; }
     .aviso-categoria { color: #ff6b6b; font-family: 'Courier New', monospace; font-size: 12px; margin-bottom: 18px; }
     .aviso-categoria a { color: #ff6b6b; }
+    .previa { width: 120px; height: 120px; object-fit: cover; display: block; margin-bottom: 10px; border: 2px solid #a8192e; }
+    .previa-placeholder { width: 120px; height: 120px; background: #a8192e; color: #111; display: flex; align-items: center;
+           justify-content: center; font-family: 'Courier New', monospace; font-size: 28px; font-weight: bold; margin-bottom: 10px; }
+    .remover-foto { display: flex; align-items: center; gap: 8px; font-family: 'Courier New', monospace; font-size: 12px;
+           text-transform: none; letter-spacing: normal; margin-top: 6px; }
+    .remover-foto input { width: auto; margin: 0; }
     .acoes { display: flex; gap: 12px; flex-wrap: wrap; margin-top: 24px; }
     </style>
 </head>
@@ -56,7 +64,8 @@
         </c:if>
 
         <div class="painel">
-            <form method="post" action="${pageContext.request.contextPath}/admin/produtos/salvar">
+            <form method="post" enctype="multipart/form-data" accept-charset="UTF-8"
+                  action="${pageContext.request.contextPath}/admin/produtos/salvar">
                 <input type="hidden" name="id" value="${campos.id}">
 
                 <div class="campo">
@@ -108,6 +117,33 @@
                     </select>
                     <c:if test="${not empty erros.idCategoria}">
                         <div class="erro-campo"><c:out value="${erros.idCategoria}" /></div>
+                    </c:if>
+                </div>
+
+                <div class="campo">
+                    <label for="foto">Foto do produto</label>
+
+                    <c:if test="${not empty campos.id}">
+                        <c:choose>
+                            <c:when test="${campos.temImagem}">
+                                <img class="previa"
+                                     src="${pageContext.request.contextPath}/imagens/produtos/${campos.id}?v=${campos.versaoImagem}"
+                                     alt="Foto atual">
+                                <div class="remover-foto">
+                                    <input type="checkbox" id="removerFoto" name="removerFoto" value="1">
+                                    <label for="removerFoto" style="display:inline; text-transform:none; letter-spacing:normal;">Remover foto atual</label>
+                                </div>
+                            </c:when>
+                            <c:otherwise>
+                                <div class="previa-placeholder"><c:out value="${fn:toUpperCase(fn:substring(campos.nome, 0, 2))}" /></div>
+                            </c:otherwise>
+                        </c:choose>
+                    </c:if>
+
+                    <input type="file" id="foto" name="foto" accept="image/png, image/jpeg, image/webp">
+                    <div class="ajuda-campo">JPEG, PNG ou WebP, até 2 MB. Opcional — deixe em branco para manter a foto atual.</div>
+                    <c:if test="${not empty erros.foto}">
+                        <div class="erro-campo"><c:out value="${erros.foto}" /></div>
                     </c:if>
                 </div>
 

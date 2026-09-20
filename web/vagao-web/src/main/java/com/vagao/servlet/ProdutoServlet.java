@@ -2,15 +2,19 @@ package com.vagao.servlet;
 
 import com.vagao.dao.CategoriaDAO;
 import com.vagao.dao.ProdutoDAO;
+import com.vagao.dao.ProdutoImagemDAO;
 import com.vagao.entidade.Categoria;
 import com.vagao.entidade.Produto;
 import com.vagao.util.Flash;
+import com.vagao.util.ImagemUpload;
 
 import javax.servlet.ServletException;
+import javax.servlet.annotation.MultipartConfig;
 import javax.servlet.annotation.WebServlet;
 import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
+import javax.servlet.http.Part;
 import java.io.IOException;
 import java.math.BigDecimal;
 import java.math.RoundingMode;
@@ -29,6 +33,11 @@ import java.util.logging.Logger;
  *        /admin/produtos/salvar (POST).
  */
 @WebServlet("/admin/produtos/*")
+@MultipartConfig(
+        fileSizeThreshold = 256 * 1024,
+        maxFileSize = 2 * 1024 * 1024,
+        maxRequestSize = 3 * 1024 * 1024
+)
 public class ProdutoServlet extends HttpServlet {
 
     private static final long serialVersionUID = 1L;
@@ -40,6 +49,7 @@ public class ProdutoServlet extends HttpServlet {
 
     private final ProdutoDAO produtoDAO = new ProdutoDAO();
     private final CategoriaDAO categoriaDAO = new CategoriaDAO();
+    private final ProdutoImagemDAO produtoImagemDAO = new ProdutoImagemDAO();
 
     @Override
     protected void doGet(HttpServletRequest request, HttpServletResponse response)
@@ -84,6 +94,13 @@ public class ProdutoServlet extends HttpServlet {
         } catch (SQLException e) {
             LOGGER.log(Level.SEVERE, "Erro ao gravar produto", e);
             throw new ServletException(e);
+        } catch (IllegalStateException e) {
+            // Lançada pelo container ao acessar parâmetro/parte quando o
+            // corpo multipart excede @MultipartConfig(maxRequestSize) —
+            // acontece antes de qualquer validação nossa rodar.
+            LOGGER.log(Level.WARNING, "Upload de imagem acima do limite", e);
+            Flash.erro(request, "A imagem enviada é grande demais (máximo 2 MB).");
+            response.sendRedirect(request.getContextPath() + "/admin/produtos");
         }
     }
 
@@ -125,6 +142,8 @@ public class ProdutoServlet extends HttpServlet {
         campos.put("preco", produto.getPreco().toPlainString());
         campos.put("estoque", String.valueOf(produto.getEstoque()));
         campos.put("idCategoria", String.valueOf(produto.getCategoria().getIdCategoria()));
+        campos.put("temImagem", String.valueOf(produto.isTemImagem()));
+        campos.put("versaoImagem", produto.getImagemVersao() == null ? "" : String.valueOf(produto.getImagemVersao()));
 
         request.setAttribute("titulo", "Editar produto");
         request.setAttribute("campos", campos);
@@ -221,7 +240,35 @@ public class ProdutoServlet extends HttpServlet {
         Integer estoque = validarEstoque(estoqueParam, erros);
         Categoria categoria = validarCategoria(idCategoriaParam, erros);
 
+        String removerFoto = request.getParameter("removerFoto");
+        Part foto = request.getPart("foto");
+        byte[] fotoBytes = null;
+        String fotoMime = null;
+
+        if (foto != null && foto.getSize() > 0) {
+            if (foto.getSize() > ImagemUpload.TAMANHO_MAXIMO) {
+                erros.put("foto", "A imagem deve ter no máximo 2 MB.");
+            } else {
+                fotoBytes = foto.getInputStream().readAllBytes();
+                fotoMime = ImagemUpload.detectarMime(fotoBytes);
+                if (fotoMime == null) {
+                    erros.put("foto", "Envie uma imagem JPEG, PNG ou WebP.");
+                }
+            }
+        }
+
         if (!erros.isEmpty()) {
+            if (idAtual != 0) {
+                // Repopula o estado atual da foto para a pré-visualização do
+                // form não "esquecer" que o produto já tem imagem, já que
+                // nada foi gravado ainda neste re-render de erro.
+                Produto atual = produtoDAO.buscarPorId(idAtual);
+                if (atual != null) {
+                    campos.put("temImagem", String.valueOf(atual.isTemImagem()));
+                    campos.put("versaoImagem",
+                            atual.getImagemVersao() == null ? "" : String.valueOf(atual.getImagemVersao()));
+                }
+            }
             request.setAttribute("titulo", idAtual == 0 ? "Novo produto" : "Editar produto");
             request.setAttribute("campos", campos);
             request.setAttribute("erros", erros);
@@ -238,13 +285,21 @@ public class ProdutoServlet extends HttpServlet {
         produto.setCategoria(categoria);
 
         if (idAtual == 0) {
-            produtoDAO.inserir(produto);
+            int novoId = produtoDAO.inserir(produto);
+            if (fotoBytes != null) {
+                produtoImagemDAO.salvar(novoId, fotoMime, fotoBytes);
+            }
             Flash.sucesso(request, "Produto cadastrado com sucesso.");
         } else {
             produto.setIdProduto(idAtual);
             if (!produtoDAO.atualizar(produto)) {
                 response.sendError(HttpServletResponse.SC_NOT_FOUND);
                 return;
+            }
+            if ("1".equals(removerFoto)) {
+                produtoImagemDAO.excluir(idAtual);
+            } else if (fotoBytes != null) {
+                produtoImagemDAO.salvar(idAtual, fotoMime, fotoBytes);
             }
             Flash.sucesso(request, "Produto atualizado com sucesso.");
         }
