@@ -37,6 +37,24 @@ public class ProdutoDAO {
         return produtos;
     }
 
+    /**
+     * Produtos com estoque disponível, para o catálogo do cliente (RF12).
+     */
+    public List<Produto> listarDisponiveis() throws SQLException {
+        String sql = SELECT_BASE + " WHERE p.estoque > 0 ORDER BY p.nome";
+        List<Produto> produtos = new ArrayList<>();
+
+        try (Connection con = ConexaoFactory.getConexao();
+             PreparedStatement stmt = con.prepareStatement(sql);
+             ResultSet rs = stmt.executeQuery()) {
+
+            while (rs.next()) {
+                produtos.add(mapear(rs));
+            }
+        }
+        return produtos;
+    }
+
     public Produto buscarPorId(int id) throws SQLException {
         String sql = SELECT_BASE + " WHERE p.id_produto = ?";
 
