@@ -18,6 +18,8 @@ public class Produto implements Serializable {
     private BigDecimal preco;
     private int estoque;
     private Categoria categoria;
+    private boolean temImagem;
+    private Long imagemVersao;
 
     public Produto() {
     }
@@ -68,5 +70,21 @@ public class Produto implements Serializable {
 
     public void setCategoria(Categoria categoria) {
         this.categoria = categoria;
+    }
+
+    public boolean isTemImagem() {
+        return temImagem;
+    }
+
+    public void setTemImagem(boolean temImagem) {
+        this.temImagem = temImagem;
+    }
+
+    public Long getImagemVersao() {
+        return imagemVersao;
+    }
+
+    public void setImagemVersao(Long imagemVersao) {
+        this.imagemVersao = imagemVersao;
     }
 }

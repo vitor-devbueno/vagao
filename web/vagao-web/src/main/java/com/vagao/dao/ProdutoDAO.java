@@ -8,6 +8,7 @@ import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Statement;
+import java.sql.Timestamp;
 import java.sql.Types;
 import java.util.ArrayList;
 import java.util.List;
@@ -19,8 +20,11 @@ public class ProdutoDAO {
 
     private static final String SELECT_BASE =
             "SELECT p.id_produto, p.nome, p.descricao, p.preco, p.estoque, "
-            + "c.id_categoria, c.nome AS nome_categoria "
-            + "FROM produto p JOIN categoria c ON c.id_categoria = p.id_categoria";
+            + "c.id_categoria, c.nome AS nome_categoria, "
+            + "(pi.id_produto IS NOT NULL) AS tem_imagem, "
+            + "pi.atualizado_em AS imagem_atualizada_em "
+            + "FROM produto p JOIN categoria c ON c.id_categoria = p.id_categoria "
+            + "LEFT JOIN produto_imagem pi ON pi.id_produto = p.id_produto";
 
     public List<Produto> listarTodos() throws SQLException {
         String sql = SELECT_BASE + " ORDER BY p.nome";
@@ -154,6 +158,10 @@ public class ProdutoDAO {
         categoria.setIdCategoria(rs.getInt("id_categoria"));
         categoria.setNome(rs.getString("nome_categoria"));
         produto.setCategoria(categoria);
+
+        produto.setTemImagem(rs.getBoolean("tem_imagem"));
+        Timestamp imagemAtualizadaEm = rs.getTimestamp("imagem_atualizada_em");
+        produto.setImagemVersao(imagemAtualizadaEm != null ? imagemAtualizadaEm.getTime() : null);
 
         return produto;
     }
