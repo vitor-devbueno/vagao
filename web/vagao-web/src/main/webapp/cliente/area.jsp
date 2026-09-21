@@ -27,7 +27,7 @@
                 <article class="cartao area__cartao">
                     <h2 class="placa">Catálogo</h2>
                     <div class="area__cartao-corpo">
-                        <p>Jaquetas, moletons e camisetas.</p>
+                        <p>Roupas e acessórios do drop.</p>
                         <a class="btn btn--primario" href="${pageContext.request.contextPath}/cliente/catalogo">Ver catálogo</a>
                     </div>
                 </article>

@@ -10,8 +10,9 @@
    3. Base (reset, tipografia, seleção, foco)
    4. Utilitários
    5. Componentes: faixa, wordmark, placa, trilho, botões, campos,
-      alertas, status de pedido, seta de voltar, navbar, rodapé
-   6. Páginas: estrutura do cliente, login, área do cliente
+      alertas, status de pedido, seta de voltar, navbar, rodapé,
+      card de produto, estado vazio
+   6. Páginas: estrutura do cliente, login, área do cliente, catálogo
    7. Movimento reduzido
    ========================================================================== */
 
@@ -124,6 +125,7 @@
     --t-lg:      1.563rem;   /* título de tela (admin) */
     --t-xl:      2rem;       /* título de seção (cliente) */
     --t-impacto: clamp(2.75rem, 9vw, 5.5rem);  /* headline de impacto */
+    --t-titulo-grande: clamp(2.25rem, 7vw, 4rem);  /* título de página (Big Shoulders) */
     --t-wordmark: 1.125rem;
 
     --tracking-wordmark: 0.35em;
@@ -578,6 +580,133 @@ input { caret-color: var(--vermelho); }
 }
 
 
+/* --- Card de produto ----------------------------------------------------------
+   O card inteiro é um <a>. Foto real (<img>) por cima de um placeholder listrado
+   com a inicial do produto: sem foto, foto quebrada (onerror remove a <img>) ou
+   ainda carregando, aparece o placeholder. Proporção fixa 4/5 + object-fit. */
+.produto {
+    display: flex;
+    flex-direction: column;
+    flex: 1;
+    background: var(--papel);
+    color: var(--preto);
+    border: var(--borda);
+    box-shadow: var(--sombra);
+    text-decoration: none;
+    transition:
+        transform var(--t-rapida) var(--ease),
+        box-shadow var(--t-rapida) var(--ease);
+}
+.produto:hover  { transform: translate(-2px, -2px); box-shadow: var(--sombra-hover); }
+.produto:active { transform: translate(3px, 3px);   box-shadow: var(--sombra-press); }
+
+.produto__midia {
+    position: relative;
+    aspect-ratio: 4 / 5;
+    overflow: hidden;
+    border-bottom: var(--borda);
+    background: repeating-linear-gradient(135deg,
+        var(--cinza) 0 0.625rem, var(--papel) 0.625rem 1.25rem);
+}
+.produto__inicial {
+    position: absolute;
+    inset: 0;
+    display: grid;
+    place-items: center;
+    font-family: var(--fonte-titulo);
+    font-weight: 700;
+    font-size: clamp(2.5rem, 12vw, 4rem);
+    line-height: 1;
+    text-transform: uppercase;
+}
+.produto__foto {
+    position: absolute;
+    inset: 0;
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    background: var(--papel);   /* PNG com transparência não deixa as listras vazarem */
+}
+
+.produto__corpo {
+    display: flex;
+    flex-direction: column;
+    flex: 1;
+    gap: var(--esp-1);
+    padding: var(--esp-3);
+}
+.produto__categoria {
+    color: var(--apoio);
+    font-family: var(--fonte-mono);
+    font-size: var(--t-xs);
+    letter-spacing: var(--tracking-label);
+    text-transform: uppercase;
+    overflow-wrap: anywhere;
+}
+.produto__nome {
+    font-size: var(--t-base);
+    font-weight: 700;
+    line-height: 1.25;
+    overflow-wrap: anywhere;
+    text-wrap: balance;
+}
+.produto__preco {
+    margin-top: auto;               /* preço e barra sempre alinhados na base */
+    padding-top: var(--esp-2);
+    color: var(--vermelho);         /* 6.56 sobre papel */
+    font-family: var(--fonte-mono);
+    font-size: var(--t-sm);
+    font-weight: 700;
+    font-variant-numeric: tabular-nums;
+}
+.produto__acao {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: var(--esp-2);
+    padding: var(--esp-2) var(--esp-3);
+    background: var(--preto);
+    color: var(--papel);
+    font-family: var(--fonte-mono);
+    font-size: var(--t-xs);
+    font-weight: 700;
+    letter-spacing: var(--tracking-label);
+    text-transform: uppercase;
+    transition: background-color var(--t-base-ms) var(--ease);
+}
+.produto:hover .produto__acao { background: var(--vermelho); }   /* papel sobre vermelho 6.56 */
+/* Seta de plataforma desenhada (sem glyph de fonte) */
+.produto__acao::after {
+    content: "";
+    flex: none;
+    width: 0.55em;
+    height: 0.55em;
+    border-top: 2px solid currentColor;
+    border-right: 2px solid currentColor;
+    transform: rotate(45deg);
+    transition: transform var(--t-base-ms) var(--ease);
+}
+.produto:hover .produto__acao::after { transform: translateX(3px) rotate(45deg); }
+
+@media (min-width: 640px) {
+    .produto__corpo { padding: var(--esp-4); gap: var(--esp-2); }
+    .produto__nome { font-size: var(--t-md); }
+    .produto__preco { font-size: var(--t-base); }
+    .produto__acao { padding: var(--esp-3) var(--esp-4); }
+}
+
+/* --- Estado vazio: mensagem direta, sem enfeite --------------------------------- */
+.vazio {
+    max-width: 32rem;
+    padding: var(--esp-5);
+    background: var(--cinza);
+    color: var(--preto);
+    border: var(--borda);
+    font-size: var(--t-md);
+    line-height: 1.4;
+}
+
+
 /* ==========================================================================
    6. PÁGINAS
    ========================================================================== */
@@ -698,6 +827,63 @@ input { caret-color: var(--vermelho); }
 }
 
 
+/* --- Catálogo (cliente/catalogo/lista.jsp) --------------------------------------
+   Grade: 2 colunas no mobile, 3 a partir de 640px, 4 a partir de 1100px
+   (onde as colunas pares descem um pouco: assimetria). */
+.catalogo {
+    width: 100%;   /* item flex com margin auto: sem isto encolhe no estado vazio */
+    max-width: 74rem;
+    margin-inline: auto;
+    padding: var(--esp-6) var(--esp-4) var(--esp-8);
+}
+.catalogo__cabecalho {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: baseline;
+    justify-content: space-between;
+    gap: var(--esp-2) var(--esp-5);
+    margin-bottom: var(--esp-6);
+    padding-bottom: var(--esp-4);
+    border-bottom: var(--borda);
+}
+.catalogo__titulo {
+    font-family: var(--fonte-impacto);
+    font-weight: 900;
+    font-size: var(--t-titulo-grande);
+    line-height: 0.95;
+    text-transform: uppercase;
+}
+.catalogo__contagem {
+    color: var(--apoio);
+    font-family: var(--fonte-mono);
+    font-size: var(--t-sm);
+    letter-spacing: var(--tracking-label);
+    text-transform: uppercase;
+}
+.catalogo .alerta { margin-bottom: var(--esp-5); }
+
+.catalogo__grade {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: var(--esp-5);
+    margin: 0;
+    padding: 0;
+    list-style: none;
+}
+.catalogo__item { display: flex; }
+
+@media (min-width: 640px) {
+    .catalogo { padding-inline: var(--esp-6); }
+    .catalogo__grade { grid-template-columns: repeat(3, minmax(0, 1fr)); gap: var(--esp-6); }
+}
+@media (min-width: 1100px) {
+    .catalogo__grade { grid-template-columns: repeat(4, minmax(0, 1fr)); }
+    /* Alterna: colunas pares mais baixas, mesmo deslocamento em todas as linhas.
+       Só com 4 colunas (em 3 viraria tabuleiro). As bases de cada linha seguem alinhadas. */
+    .catalogo__item:nth-child(even) { margin-top: var(--esp-6); }
+}
+
+
 /* ==========================================================================
    7. MOVIMENTO REDUZIDO
    Sem transições nem deslocamentos para quem pede menos movimento.
@@ -707,6 +893,7 @@ input { caret-color: var(--vermelho); }
         transition-duration: 0.01ms !important;
         animation-duration: 0.01ms !important;
     }
-    .btn:hover, .btn:active { transform: none; }
+    .btn:hover, .btn:active, .produto:hover, .produto:active { transform: none; }
+    .produto:hover .produto__acao::after { transform: rotate(45deg); }
     .voltar:hover::before { transform: rotate(45deg); }
 }
