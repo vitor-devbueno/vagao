@@ -1,0 +1,558 @@
+/* ==========================================================================
+   VAGÃO — folha de estilos compartilhada
+   Identidade: streetwear autoral com linguagem de metrô/transporte urbano.
+   Só camada visual. Sem framework. Mobile-first (base = 360px).
+
+   Índice
+   1. Fontes (@font-face, self-hosted)
+   2. Tokens (variáveis)
+   3. Base (reset, tipografia, seleção, foco)
+   4. Utilitários
+   5. Componentes: faixa, wordmark, placa, trilho, botões, campos,
+      alertas, status de pedido, seta de voltar
+   6. Páginas: login
+   7. Movimento reduzido
+   ========================================================================== */
+
+
+/* ==========================================================================
+   1. FONTES
+   Caminhos relativos a /css/. Fontes variáveis: um arquivo cobre todos os
+   pesos. Só o subset latin (cobre todos os acentos do português).
+   Licenças OFL em /fonts/OFL-*.txt.
+   ========================================================================== */
+@font-face {
+    font-family: "Libre Caslon Text";
+    font-style: normal;
+    font-weight: 400;
+    font-display: swap;
+    src: url("../fonts/libre-caslon-text-400.woff2") format("woff2");
+}
+@font-face {
+    font-family: "Libre Caslon Text";
+    font-style: italic;
+    font-weight: 400;
+    font-display: swap;
+    src: url("../fonts/libre-caslon-text-400i.woff2") format("woff2");
+}
+@font-face {
+    font-family: "Libre Caslon Text";
+    font-style: normal;
+    font-weight: 700;
+    font-display: swap;
+    src: url("../fonts/libre-caslon-text-700.woff2") format("woff2");
+}
+@font-face {
+    font-family: "JetBrains Mono";
+    font-style: normal;
+    font-weight: 100 800;
+    font-display: swap;
+    src: url("../fonts/jetbrains-mono-variable.woff2") format("woff2");
+}
+@font-face {
+    font-family: "Big Shoulders Display";
+    font-style: normal;
+    font-weight: 100 900;
+    font-display: swap;
+    src: url("../fonts/big-shoulders-display-variable.woff2") format("woff2");
+}
+
+
+/* ==========================================================================
+   2. TOKENS
+   ========================================================================== */
+:root {
+    /* --- Marca ---------------------------------------------------------- */
+    --vermelho:        #a8192e;
+    --vermelho-escuro: #7d1223;   /* hover, bordas, erro, "cancelado" */
+    --preto:           #111111;
+    --cinza:           #d9d9d9;   /* superfícies, botão secundário */
+    --papel:           #f4f1ec;   /* off-white: leitura e texto sobre vermelho */
+    --branco:          #ffffff;
+    --apoio:           #5c5c5c;   /* texto secundário sobre papel/cinza */
+    --apoio-claro:     #b8b8b8;   /* texto secundário sobre preto */
+
+    /* --- Contraste de referência (WCAG, texto normal >= 4.5 / grande >= 3) --
+       papel   sobre vermelho .... 6.56    branco sobre vermelho ..... 7.39
+       cinza   sobre vermelho .... 5.23    preto sobre vermelho ...... 2.56 (NÃO usar como texto)
+       preto   sobre papel ....... 16.76   preto sobre cinza ......... 13.38
+       papel   sobre preto ....... 16.76   cinza sobre preto ......... 13.38
+       apoio   sobre papel ....... 5.94    apoio sobre cinza ......... 4.74
+       apoio-claro sobre preto ... 9.52    vermelho sobre papel ...... 6.56
+       vermelho-escuro sobre papel 9.40    vermelho como texto sobre preto: NÃO usar (2.56)
+       Regra: sobre vermelho o texto é papel/branco; o preto ali só como
+       borda e sombra dura, nunca como texto. */
+
+    /* --- Foco visível ---------------------------------------------------
+       --foco-claro  : sobre vermelho e preto  -> branco  (7.39 / 18.88)
+       --foco-escuro : sobre papel e cinza     -> preto   (16.76 / 13.38)
+       O contexto troca --foco (ver .fundo-escuro / .fundo-claro). */
+    --foco-claro:  #ffffff;
+    --foco-escuro: #111111;
+    --foco:        var(--foco-escuro);
+
+    /* --- Alertas ---------------------------------------------------------
+       Razão do texto sobre o fundo (mínimo exigido 4.5:1):
+       erro    #7d1223 sobre #f6dcdf .... 8.18
+       sucesso #1f6b3a sobre #dcefe2 .... 5.43
+       O texto do alerta também traz prefixo "ERRO:" / "OK:" (não só cor). */
+    --erro:          #7d1223;
+    --erro-fundo:    #f6dcdf;
+    --sucesso:       #1f6b3a;
+    --sucesso-fundo: #dcefe2;
+
+    /* --- Status de pedido ("linhas de metrô") -----------------------------
+       Cada status tem cor + número/símbolo + rótulo em texto.
+       Símbolo sobre a cor: 1 papel/preto 16.76 · 2 preto/âmbar 6.40 ·
+       3 papel/azul 5.74 · 4 papel/verde 5.78 · × papel/vermelho-escuro 9.40 */
+    --status-pendente:   #111111;
+    --status-preparo:    #c98a00;
+    --status-enviado:    #1a5fa8;
+    --status-entregue:   #1f6b3a;
+    --status-cancelado:  #7d1223;
+
+    /* --- Tipografia ------------------------------------------------------ */
+    --fonte-titulo:  "Libre Caslon Text", Georgia, "Times New Roman", serif;
+    --fonte-mono:    "JetBrains Mono", ui-monospace, "Courier New", monospace;
+    --fonte-impacto: "Big Shoulders Display", "Arial Narrow", sans-serif;
+
+    --t-xs:      0.75rem;    /* labels, tags (mono) */
+    --t-sm:      0.875rem;   /* dados, apoio (mono) */
+    --t-base:    1rem;       /* texto corrido */
+    --t-md:      1.25rem;    /* nome de produto, subtítulo */
+    --t-lg:      1.563rem;   /* título de tela (admin) */
+    --t-xl:      2rem;       /* título de seção (cliente) */
+    --t-impacto: clamp(2.75rem, 9vw, 5.5rem);  /* headline de impacto */
+    --t-wordmark: 1.125rem;
+
+    --tracking-wordmark: 0.35em;
+    --tracking-label:    0.12em;
+
+    /* --- Espaçamento (escala de 4px) ------------------------------------ */
+    --esp-1: 0.25rem;
+    --esp-2: 0.5rem;
+    --esp-3: 0.75rem;
+    --esp-4: 1rem;
+    --esp-5: 1.5rem;
+    --esp-6: 2rem;
+    --esp-7: 3rem;
+    --esp-8: 4rem;
+    --esp-9: 6rem;
+
+    /* --- Bordas e sombras duras (sem blur) ------------------------------- */
+    --borda:         2px solid var(--preto);
+    --sombra:        4px 4px 0 var(--preto);
+    --sombra-hover:  6px 6px 0 var(--preto);
+    --sombra-lg:     8px 8px 0 var(--preto);
+    --sombra-press:  1px 1px 0 var(--preto);
+    --sombra-vermelha: 4px 4px 0 var(--vermelho);
+    --raio-pilula:   999px;   /* usado em UM elemento por tela, no máximo */
+
+    /* --- Breakpoints (referência; custom property não vale em @media) ---
+       base 360px · 640px · 900px · 1280px */
+
+    /* --- Movimento -------------------------------------------------------- */
+    --t-rapida: 80ms;
+    --t-base-ms: 140ms;
+    --ease: cubic-bezier(0.22, 1, 0.36, 1);   /* ease-out exponencial */
+}
+
+
+/* ==========================================================================
+   3. BASE
+   ========================================================================== */
+*, *::before, *::after { box-sizing: border-box; }
+
+html {
+    -webkit-text-size-adjust: 100%;
+    text-size-adjust: 100%;
+}
+
+body {
+    margin: 0;
+    background: var(--papel);
+    color: var(--preto);
+    font-family: var(--fonte-titulo);
+    font-size: var(--t-base);
+    line-height: 1.55;
+    -webkit-font-smoothing: antialiased;
+}
+
+h1, h2, h3, p { margin: 0; }
+
+img { display: block; max-width: 100%; }
+
+a {
+    color: inherit;
+    text-decoration-thickness: 2px;
+    text-underline-offset: 3px;
+}
+
+/* Seleção de texto e cursor de digitação seguem a paleta */
+::selection { background: var(--preto); color: var(--papel); }
+input { caret-color: var(--vermelho); }
+
+/* Foco: anel de 2px com folga de 3px. A cor vem de --foco, que muda
+   conforme o fundo (ver utilitários). Nunca preto sobre vermelho. */
+:focus-visible {
+    outline: 2px solid var(--foco);
+    outline-offset: 3px;
+}
+
+
+/* ==========================================================================
+   4. UTILITÁRIOS
+   ========================================================================== */
+/* Fundo escuro/vermelho: foco claro. Fundo papel/cinza: foco escuro. */
+.fundo-escuro { --foco: var(--foco-claro); }
+.fundo-claro  { --foco: var(--foco-escuro); }
+
+/* Texto só para leitores de tela */
+.so-leitor {
+    position: absolute;
+    width: 1px; height: 1px;
+    margin: -1px; padding: 0;
+    overflow: hidden;
+    clip: rect(0 0 0 0);
+    white-space: nowrap;
+    border: 0;
+}
+
+
+/* ==========================================================================
+   5. COMPONENTES
+   ========================================================================== */
+
+/* --- Faixa do topo ("DROP ESPECIAL") -------------------------------------
+   O texto fica em UM lugar: WEB-INF/fragmentos/faixa.jspf */
+.faixa {
+    background: var(--preto);
+    color: var(--papel);
+    padding: var(--esp-2) var(--esp-4);
+    text-align: center;
+    font-family: var(--fonte-mono);
+    font-size: var(--t-xs);
+    font-weight: 500;
+    letter-spacing: var(--tracking-label);
+    text-transform: uppercase;
+}
+
+/* --- Wordmark: "VAGÃO //" com tracking largo (Libre Caslon 400) ---------- */
+.wordmark {
+    font-family: var(--fonte-titulo);
+    font-weight: 400;
+    font-size: var(--t-wordmark);
+    letter-spacing: var(--tracking-wordmark);
+    text-transform: uppercase;
+    line-height: 1;
+}
+
+/* --- Headline de impacto (Big Shoulders só aqui e em títulos grandes) ---- */
+.impacto {
+    font-family: var(--fonte-impacto);
+    font-weight: 900;
+    font-size: var(--t-impacto);
+    line-height: 0.9;
+    letter-spacing: 0.005em;
+    text-transform: uppercase;
+    text-wrap: balance;
+}
+
+/* --- Placa de estação: cabeçalho de seção/cartão -------------------------- */
+.placa {
+    display: block;
+    background: var(--preto);
+    color: var(--papel);
+    padding: var(--esp-2) var(--esp-4);
+    font-family: var(--fonte-mono);
+    font-size: var(--t-xs);
+    font-weight: 700;
+    letter-spacing: var(--tracking-label);
+    text-transform: uppercase;
+    line-height: 1.2;
+}
+
+/* --- Trilho: faixa decorativa de dormentes -------------------------------- */
+.trilho {
+    height: 0.75rem;
+    background:
+        repeating-linear-gradient(90deg,
+            var(--preto) 0 1.5rem, transparent 1.5rem 2.25rem) center / 100% 0.25rem no-repeat,
+        repeating-linear-gradient(90deg,
+            var(--preto) 0 0.375rem, transparent 0.375rem 1.5rem) center / 100% 100% no-repeat;
+}
+
+/* --- Cartão com sombra dura ------------------------------------------------ */
+.cartao {
+    background: var(--papel);
+    color: var(--preto);
+    border: var(--borda);
+    box-shadow: var(--sombra-lg);
+}
+
+/* --- Botões ----------------------------------------------------------------
+   Repouso: sombra 4px. Hover: sobe e a sombra cresce. Ativo: "afunda". */
+.btn {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: var(--esp-2);
+    min-height: 2.75rem;                 /* alvo de toque >= 44px */
+    padding: var(--esp-3) var(--esp-5);
+    border: var(--borda);
+    border-radius: 0;
+    font-family: var(--fonte-mono);
+    font-size: var(--t-sm);
+    font-weight: 700;
+    letter-spacing: var(--tracking-label);
+    text-transform: uppercase;
+    text-decoration: none;
+    cursor: pointer;
+    transition:
+        transform var(--t-rapida) var(--ease),
+        box-shadow var(--t-rapida) var(--ease),
+        background-color var(--t-base-ms) var(--ease);
+}
+.btn--bloco { width: 100%; }
+
+.btn--primario   { background: var(--preto);           color: var(--papel); box-shadow: var(--sombra-vermelha); }
+.btn--secundario { background: var(--cinza);           color: var(--preto); box-shadow: var(--sombra); }
+.btn--perigo     { background: var(--vermelho-escuro); color: var(--papel); box-shadow: var(--sombra); }
+
+.btn:hover {
+    transform: translate(-2px, -2px);
+    box-shadow: 6px 6px 0 var(--preto);
+}
+.btn--primario:hover { background: var(--vermelho-escuro); box-shadow: 6px 6px 0 var(--vermelho); }
+.btn--perigo:hover   { background: var(--vermelho); }
+
+.btn:active {
+    transform: translate(3px, 3px);
+    box-shadow: var(--sombra-press);
+}
+
+.btn:disabled,
+.btn[aria-disabled="true"] {
+    background: var(--cinza);
+    color: var(--apoio);
+    border-color: var(--apoio);
+    box-shadow: none;
+    transform: none;
+    cursor: not-allowed;
+}
+
+/* --- Campos de formulário --------------------------------------------------- */
+.campo { display: block; }
+.campo + .campo { margin-top: var(--esp-4); }
+
+.campo__rotulo {
+    display: block;
+    margin-bottom: var(--esp-2);
+    font-family: var(--fonte-mono);
+    font-size: var(--t-xs);
+    font-weight: 700;
+    letter-spacing: var(--tracking-label);
+    text-transform: uppercase;
+}
+
+.campo__entrada {
+    display: block;
+    width: 100%;
+    min-height: 2.75rem;
+    padding: var(--esp-3);
+    background: var(--branco);
+    color: var(--preto);
+    border: var(--borda);
+    border-radius: 0;
+    font-family: var(--fonte-mono);
+    font-size: var(--t-base);            /* 16px: evita zoom automático no iOS */
+    transition: box-shadow var(--t-rapida) var(--ease);
+}
+.campo__entrada:hover { box-shadow: var(--sombra); }
+.campo__entrada:focus-visible { box-shadow: var(--sombra); }
+/* Autofill do navegador: troca o azul-claro padrão pela cor do próprio campo.
+   Pinta o fundo com um inset enorme (a única forma de vencer o estilo do
+   navegador) e fixa a cor do texto. A borda 2px e o foco não mudam; a sombra
+   dura precisa ser repetida na mesma lista porque usa a mesma propriedade. */
+.campo__entrada:-webkit-autofill,
+.campo__entrada:autofill {
+    -webkit-text-fill-color: var(--preto);
+    box-shadow: 0 0 0 1000px var(--branco) inset;
+}
+.campo__entrada:-webkit-autofill:hover,
+.campo__entrada:-webkit-autofill:focus-visible,
+.campo__entrada:autofill:hover,
+.campo__entrada:autofill:focus-visible {
+    box-shadow: 0 0 0 1000px var(--branco) inset, var(--sombra);
+}
+.campo__entrada:disabled {
+    background: var(--cinza);
+    color: var(--apoio);
+    border-color: var(--apoio);
+    box-shadow: none;
+    cursor: not-allowed;
+}
+
+/* --- Alertas: cor + prefixo em texto ("ERRO:" / "OK:") ---------------------- */
+.alerta {
+    padding: var(--esp-3) var(--esp-4);
+    border: 2px solid currentColor;
+    font-family: var(--fonte-mono);
+    font-size: var(--t-sm);
+    line-height: 1.45;
+}
+.alerta__prefixo {
+    font-weight: 700;
+    letter-spacing: var(--tracking-label);
+    text-transform: uppercase;
+}
+.alerta--erro    { background: var(--erro-fundo);    color: var(--erro); }
+.alerta--sucesso { background: var(--sucesso-fundo); color: var(--sucesso); }
+
+/* --- Status de pedido: bullet de linha de metrô + rótulo ---------------------
+   Uso: <span class="status status-em-preparo">…</span>
+   O número/símbolo está no ::before; o rótulo (texto) vem do HTML.
+   Status desconhecido cai no estilo neutro com "?". */
+.status {
+    --status-cor: var(--apoio);
+    --status-texto: var(--papel);
+    display: inline-flex;
+    align-items: center;
+    gap: var(--esp-2);
+    font-family: var(--fonte-mono);
+    font-size: var(--t-xs);
+    font-weight: 500;
+    letter-spacing: var(--tracking-label);
+    text-transform: uppercase;
+    color: var(--preto);
+}
+.status::before {
+    content: "?";
+    flex: none;
+    display: grid;
+    place-items: center;
+    width: 1.75rem;
+    height: 1.75rem;
+    border: var(--borda);
+    border-radius: 50%;
+    background: var(--status-cor);
+    color: var(--status-texto);
+    font-size: var(--t-sm);
+    font-weight: 700;
+    letter-spacing: 0;
+}
+.status-pendente   { --status-cor: var(--status-pendente); }
+.status-pendente::before   { content: "1"; }
+.status-em-preparo { --status-cor: var(--status-preparo); --status-texto: var(--preto); }
+.status-em-preparo::before { content: "2"; }
+.status-enviado    { --status-cor: var(--status-enviado); }
+.status-enviado::before    { content: "3"; }
+.status-entregue   { --status-cor: var(--status-entregue); }
+.status-entregue::before   { content: "4"; }
+/* Pronto para uso futuro: o sistema ainda não grava "cancelado". */
+.status-cancelado  { --status-cor: var(--status-cancelado); }
+.status-cancelado::before  { content: "\00d7"; }
+
+/* --- Seta de plataforma (voltar): chevron desenhado, sem glyph de fonte ------ */
+.voltar {
+    display: inline-flex;
+    align-items: center;
+    gap: var(--esp-2);
+    font-family: var(--fonte-mono);
+    font-size: var(--t-xs);
+    font-weight: 700;
+    letter-spacing: var(--tracking-label);
+    text-transform: uppercase;
+    text-decoration: none;
+}
+.voltar::before {
+    content: "";
+    width: 0.6em;
+    height: 0.6em;
+    border-left: 2px solid currentColor;
+    border-bottom: 2px solid currentColor;
+    transform: rotate(45deg);
+    transition: transform var(--t-base-ms) var(--ease);
+}
+.voltar:hover { text-decoration: underline; }
+.voltar:hover::before { transform: translateX(-3px) rotate(45deg); }
+
+
+/* ==========================================================================
+   6. PÁGINAS
+   ========================================================================== */
+
+/* --- Login ------------------------------------------------------------------
+   Mobile: marca e headline empilhados sobre o cartão.
+   >= 900px: headline enorme à esquerda, cartão deslocado à direita. */
+.pagina-login {
+    min-height: 100vh;
+    min-height: 100dvh;
+    display: flex;
+    flex-direction: column;
+    background: var(--vermelho);
+    color: var(--papel);
+}
+
+.login {
+    flex: 1;
+    display: grid;
+    gap: var(--esp-6);
+    align-content: center;
+    width: 100%;
+    max-width: 74rem;
+    margin-inline: auto;
+    padding: var(--esp-6) var(--esp-4);
+}
+
+.login__marca { display: grid; gap: var(--esp-5); }
+.login__marca .impacto { color: var(--branco); }
+
+.login__cartao {
+    padding: var(--esp-5);
+    width: 100%;
+    max-width: 26rem;
+}
+/* A placa sangra até as bordas do cartão (compensa o padding) */
+.login__cartao .placa {
+    margin: calc(-1 * var(--esp-5)) calc(-1 * var(--esp-5)) var(--esp-5);
+}
+.login__cartao .alerta { margin-bottom: var(--esp-4); }
+.login__cartao .btn { margin-top: var(--esp-5); }
+
+.pagina-login .trilho { flex: none; margin-bottom: var(--esp-4); }
+
+@media (min-width: 640px) {
+    .login { padding-inline: var(--esp-6); }
+    .login__cartao { padding: var(--esp-6); }
+    .login__cartao .placa {
+        margin: calc(-1 * var(--esp-6)) calc(-1 * var(--esp-6)) var(--esp-5);
+    }
+}
+
+@media (min-width: 900px) {
+    .login {
+        grid-template-columns: minmax(0, 1.25fr) minmax(20rem, 26rem);
+        gap: var(--esp-8);
+        /* Centralizado: marca e cartão compartilham o eixo vertical e o
+           conjunto fica equilibrado entre a faixa e o trilho. */
+        align-items: center;
+        padding-block: var(--esp-7);
+    }
+    .login__marca { gap: var(--esp-6); }
+    .login__cartao { justify-self: end; }
+}
+
+
+/* ==========================================================================
+   7. MOVIMENTO REDUZIDO
+   Sem transições nem deslocamentos para quem pede menos movimento.
+   ========================================================================== */
+@media (prefers-reduced-motion: reduce) {
+    *, *::before, *::after {
+        transition-duration: 0.01ms !important;
+        animation-duration: 0.01ms !important;
+    }
+    .btn:hover, .btn:active { transform: none; }
+    .voltar:hover::before { transform: rotate(45deg); }
+}

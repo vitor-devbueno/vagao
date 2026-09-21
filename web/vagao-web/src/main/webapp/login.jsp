@@ -2,120 +2,58 @@
 <%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core" %>
 <%@ taglib prefix="fn" uri="http://java.sun.com/jsp/jstl/functions" %>
 <!DOCTYPE html>
-<html lang="pt-br">
+<html lang="pt-BR">
 <head>
     <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
     <title>VAGÃO — Login</title>
-    <style>
-    * { box-sizing: border-box; margin: 0; padding: 0; }
-    body {
-        min-height: 100vh;
-        display: flex;
-        align-items: center;
-        justify-content: center;
-        background: #111;
-        color: #f2f2f2;
-        font-family: Georgia, 'Times New Roman', serif;
-    }
-    .card {
-        background: #a8192e;
-        border: 3px solid #111;
-        box-shadow: 8px 8px 0 #111;
-        padding: 48px 40px;
-        width: 100%;
-        max-width: 380px;
-    }
-    .marca {
-        font-family: 'Courier New', monospace;
-        font-size: 14px;
-        letter-spacing: 6px;
-        text-transform: uppercase;
-        color: #111;
-        margin-bottom: 4px;
-    }
-    h1 {
-        font-size: 34px;
-        font-weight: 900;
-        text-transform: uppercase;
-        line-height: 1.05;
-        color: #111;
-        margin-bottom: 28px;
-    }
-    label {
-        display: block;
-        font-family: 'Courier New', monospace;
-        font-size: 11px;
-        letter-spacing: 2px;
-        text-transform: uppercase;
-        color: #111;
-        margin-top: 18px;
-        margin-bottom: 6px;
-    }
-    input[type="email"], input[type="password"] {
-        width: 100%;
-        padding: 12px;
-        background: #f2f2f2;
-        border: none;
-        font-family: 'Courier New', monospace;
-        font-size: 14px;
-        color: #111;
-        margin-bottom: 0;
-    }
-    button {
-        margin-top: 28px;
-        width: 100%;
-        padding: 14px;
-        background: #111;
-        color: #f2f2f2;
-        border: none;
-        font-family: 'Courier New', monospace;
-        font-weight: bold;
-        text-transform: uppercase;
-        letter-spacing: 3px;
-        cursor: pointer;
-    }
-    button:hover { background: #000; }
-    .erro {
-        background: #111;
-        color: #ff6b6b;
-        padding: 12px;
-        margin-bottom: 16px;
-        font-family: 'Courier New', monospace;
-        font-size: 12px;
-        border-left: 4px solid #ff6b6b;
-    }
-    .aviso {
-        background: #111;
-        color: #8fd98f;
-        padding: 12px;
-        margin-bottom: 16px;
-        font-family: 'Courier New', monospace;
-        font-size: 12px;
-        border-left: 4px solid #8fd98f;
-    }
-    </style>
+
+    <%-- Fontes usadas acima da dobra: pré-carrega para evitar o "pulo" de troca de fonte --%>
+    <link rel="preload" href="${pageContext.request.contextPath}/fonts/big-shoulders-display-variable.woff2" as="font" type="font/woff2" crossorigin>
+    <link rel="preload" href="${pageContext.request.contextPath}/fonts/libre-caslon-text-400.woff2" as="font" type="font/woff2" crossorigin>
+    <link rel="stylesheet" href="${pageContext.request.contextPath}/css/vagao.css">
 </head>
-<body>
-    <div class="card">
-       <p class="marca">V A G Ã O //</p>
-	<h1>Vista sua<br>Identidade.</h1>
+<body class="pagina-login fundo-escuro">
+    <%@ include file="/WEB-INF/fragmentos/faixa.jspf" %>
 
-        <c:if test="${not empty erro}">
-            <div class="erro"><c:out value="${erro}" /></div>
-        </c:if>
-        <c:if test="${empty erro and param.logout == '1'}">
-            <div class="aviso">Sessão encerrada com sucesso.</div>
-        </c:if>
+    <main class="login">
+        <header class="login__marca">
+            <p class="wordmark">VAGÃO //</p>
+            <h1 class="impacto">Vista sua<br>identidade.</h1>
+        </header>
 
-        <form method="post" action="${pageContext.request.contextPath}/login">
-            <label for="email">E-mail</label>
-            <input type="email" id="email" name="email" value="${fn:escapeXml(email)}" required autofocus>
+        <section class="login__cartao cartao fundo-claro" aria-labelledby="titulo-login">
+            <h2 class="placa" id="titulo-login">Acesso</h2>
 
-            <label for="senha">Senha</label>
-            <input type="password" id="senha" name="senha" required>
+            <c:if test="${not empty erro}">
+                <div class="alerta alerta--erro" role="alert">
+                    <strong class="alerta__prefixo">Erro:</strong> <c:out value="${erro}" />
+                </div>
+            </c:if>
+            <c:if test="${empty erro and param.logout == '1'}">
+                <div class="alerta alerta--sucesso" role="status">
+                    <strong class="alerta__prefixo">OK:</strong> Sessão encerrada com sucesso.
+                </div>
+            </c:if>
 
-            <button type="submit">Entrar</button>
-        </form>
-    </div>
+            <form method="post" action="${pageContext.request.contextPath}/login">
+                <div class="campo">
+                    <label class="campo__rotulo" for="email">E-mail</label>
+                    <input class="campo__entrada" type="email" id="email" name="email"
+                           value="${fn:escapeXml(email)}" autocomplete="username" required autofocus>
+                </div>
+
+                <div class="campo">
+                    <label class="campo__rotulo" for="senha">Senha</label>
+                    <input class="campo__entrada" type="password" id="senha" name="senha"
+                           autocomplete="current-password" required>
+                </div>
+
+                <button class="btn btn--primario btn--bloco" type="submit">Entrar</button>
+            </form>
+        </section>
+    </main>
+
+    <div class="trilho" aria-hidden="true"></div>
 </body>
 </html>
