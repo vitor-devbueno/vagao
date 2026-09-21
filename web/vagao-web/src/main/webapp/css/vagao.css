@@ -1,3 +1,4 @@
+@charset "UTF-8";
 /* ==========================================================================
    VAGÃO — folha de estilos compartilhada
    Identidade: streetwear autoral com linguagem de metrô/transporte urbano.
@@ -9,8 +10,8 @@
    3. Base (reset, tipografia, seleção, foco)
    4. Utilitários
    5. Componentes: faixa, wordmark, placa, trilho, botões, campos,
-      alertas, status de pedido, seta de voltar
-   6. Páginas: login
+      alertas, status de pedido, seta de voltar, navbar, rodapé
+   6. Páginas: estrutura do cliente, login, área do cliente
    7. Movimento reduzido
    ========================================================================== */
 
@@ -478,9 +479,117 @@ input { caret-color: var(--vermelho); }
 .voltar:hover::before { transform: translateX(-3px) rotate(45deg); }
 
 
+/* --- Navbar (área do cliente) ------------------------------------------------
+   Fragmento: WEB-INF/fragmentos/cliente-topo.jspf. Duas linhas no mobile
+   (marca em cima, links embaixo); uma linha a partir de 640px. */
+.navbar {
+    background: var(--papel);
+    border-bottom: var(--borda);
+}
+.navbar__interno {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    justify-content: space-between;
+    gap: 0 var(--esp-5);
+    max-width: 74rem;
+    margin-inline: auto;
+    padding: var(--esp-1) var(--esp-4);
+}
+.navbar__marca {
+    display: inline-flex;
+    align-items: center;
+    min-height: 2.75rem;
+    color: var(--preto);
+    text-decoration: none;
+}
+.navbar__nav {
+    display: flex;
+    flex-wrap: wrap;
+    flex-basis: 100%;
+    gap: var(--esp-1);
+    margin-left: calc(-1 * var(--esp-3));   /* alinha o texto do 1º link à marca */
+}
+.navbar__link {
+    display: inline-flex;
+    align-items: center;
+    min-height: 2.75rem;                    /* alvo de toque >= 44px */
+    padding: 0 var(--esp-3);
+    color: var(--preto);
+    font-family: var(--fonte-mono);
+    font-size: var(--t-xs);
+    font-weight: 700;
+    letter-spacing: var(--tracking-label);
+    text-transform: uppercase;
+    text-decoration: none;
+    transition:
+        background-color var(--t-rapida) var(--ease),
+        color var(--t-rapida) var(--ease);
+}
+.navbar__link:hover { background: var(--preto); color: var(--papel); }
+/* Página atual: barra vermelha sob o texto (vermelho sobre papel = 6.56) */
+.navbar__link[aria-current="page"] { box-shadow: inset 0 -3px 0 var(--vermelho); }
+.navbar__link--sair { margin-left: auto; }
+
+@media (min-width: 640px) {
+    .navbar__interno { padding-inline: var(--esp-6); }
+    .navbar__nav { flex-basis: auto; margin-left: 0; margin-right: calc(-1 * var(--esp-3)); }
+}
+
+/* --- Rodapé ---------------------------------------------------------------------
+   Fragmento: WEB-INF/fragmentos/rodape.jspf. Fundo preto, texto claro. */
+.rodape {
+    background: var(--preto);
+    color: var(--papel);
+}
+.rodape__interno {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    justify-content: space-between;
+    gap: var(--esp-4) var(--esp-6);
+    max-width: 74rem;
+    margin-inline: auto;
+    padding: var(--esp-6) var(--esp-4);
+}
+.rodape__lista {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: var(--esp-2) var(--esp-5);
+    margin: 0;
+    padding: 0;
+    list-style: none;
+    font-family: var(--fonte-mono);
+    font-size: var(--t-xs);
+    letter-spacing: var(--tracking-label);
+    text-transform: uppercase;
+}
+.rodape__valor { color: var(--apoio-claro); }   /* 9.52 sobre preto */
+.rodape__sair {
+    display: inline-flex;
+    align-items: center;
+    min-height: 2.75rem;
+    font-weight: 700;
+}
+
+@media (min-width: 640px) {
+    .rodape__interno { padding-inline: var(--esp-6); }
+}
+
+
 /* ==========================================================================
    6. PÁGINAS
    ========================================================================== */
+
+/* --- Estrutura das telas do cliente: topo, conteúdo que cresce, rodapé ------ */
+.pagina-cliente {
+    min-height: 100vh;
+    min-height: 100dvh;
+    display: flex;
+    flex-direction: column;
+}
+.pagina-cliente > main { flex: 1; }
 
 /* --- Login ------------------------------------------------------------------
    Mobile: marca e headline empilhados sobre o cartão.
@@ -541,6 +650,51 @@ input { caret-color: var(--vermelho); }
     }
     .login__marca { gap: var(--esp-6); }
     .login__cartao { justify-self: end; }
+}
+
+
+/* --- Área do cliente (cliente/area.jsp) ------------------------------------------
+   Faixa vermelha com a headline; os cartões de atalho sobem e cruzam a borda
+   da faixa. No desktop o 2º cartão desce um pouco (assimetria). */
+.area__interno {
+    max-width: 74rem;
+    margin-inline: auto;
+    padding-inline: var(--esp-4);
+}
+.area__hero {
+    background: var(--vermelho);
+    color: var(--papel);
+    padding-block: var(--esp-7) var(--esp-9);
+}
+.area__hero .impacto { color: var(--branco); overflow-wrap: anywhere; }
+.area__saudacao {
+    margin-top: var(--esp-4);
+    max-width: 36rem;
+    font-size: var(--t-md);
+    line-height: 1.4;
+    overflow-wrap: anywhere;
+}
+.area__atalhos {
+    position: relative;
+    margin-top: calc(-1 * var(--esp-8));
+    padding-bottom: var(--esp-8);
+}
+.area__grade { display: grid; gap: var(--esp-6); }
+.area__cartao-corpo {
+    display: grid;
+    gap: var(--esp-5);
+    justify-items: start;
+    padding: var(--esp-5);
+}
+.area__cartao-corpo p { max-width: 32ch; }
+
+@media (min-width: 640px) {
+    .area__interno { padding-inline: var(--esp-6); }
+}
+@media (min-width: 900px) {
+    .area__grade { grid-template-columns: repeat(2, minmax(0, 1fr)); gap: var(--esp-7); }
+    .area__cartao { align-self: start; }   /* cada cartão com a própria altura */
+    .area__cartao:nth-child(2) { margin-top: var(--esp-6); }
 }
 
 

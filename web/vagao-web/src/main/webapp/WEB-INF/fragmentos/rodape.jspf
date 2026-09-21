@@ -1,0 +1,17 @@
+<%@ page pageEncoding="UTF-8" %>
+<%--
+    Rodapé compartilhado. Uso: <%@ include file="/WEB-INF/fragmentos/rodape.jspf" %> antes de </body>.
+    TODO (antes da entrega): substituir os DOIS placeholders abaixo (Instagram e WhatsApp)
+    pelos dados reais e, se quiser, trocar cada <span class="rodape__valor"> por um <a>
+    (ex.: https://instagram.com/<conta> e https://wa.me/55DDDNUMERO). Este é o único lugar.
+--%>
+<footer class="rodape fundo-escuro">
+    <div class="rodape__interno">
+        <p class="wordmark">VAGÃO //</p>
+        <ul class="rodape__lista">
+            <li>Instagram <span class="rodape__valor">@INSTAGRAM_AQUI</span></li>
+            <li>WhatsApp <span class="rodape__valor">(00) 00000-0000</span></li>
+            <li><a class="rodape__sair" href="${pageContext.request.contextPath}/logout">Sair</a></li>
+        </ul>
+    </div>
+</footer>

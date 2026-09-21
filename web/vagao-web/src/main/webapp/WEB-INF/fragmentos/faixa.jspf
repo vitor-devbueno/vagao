@@ -1,2 +1,3 @@
+<%@ page pageEncoding="UTF-8" %>
 <%-- Faixa preta do topo. Este é o ÚNICO lugar onde o texto da faixa é definido: troque aqui. --%>
 <div class="faixa fundo-escuro">DROP ESPECIAL</div>

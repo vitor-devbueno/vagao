@@ -1,0 +1,19 @@
+<%@ page pageEncoding="UTF-8" %>
+<%--
+    Topo das telas do cliente: faixa "DROP ESPECIAL" + navbar.
+    Uso (na JSP, dentro do <body>):
+        <c:set var="paginaAtiva" value="catalogo" scope="request" />   (area | catalogo | pedidos)
+        <%@ include file="/WEB-INF/fragmentos/cliente-topo.jspf" %>
+    A JSP que inclui este fragmento precisa declarar a taglib "c" (JSTL core).
+--%>
+<%@ include file="/WEB-INF/fragmentos/faixa.jspf" %>
+<header class="navbar fundo-claro">
+    <div class="navbar__interno">
+        <a class="navbar__marca wordmark" href="${pageContext.request.contextPath}/cliente/area.jsp">VAGÃO //</a>
+        <nav class="navbar__nav" aria-label="Principal">
+            <a class="navbar__link" href="${pageContext.request.contextPath}/cliente/catalogo"<c:if test="${paginaAtiva == 'catalogo'}"> aria-current="page"</c:if>>Catálogo</a>
+            <a class="navbar__link" href="${pageContext.request.contextPath}/cliente/pedidos"<c:if test="${paginaAtiva == 'pedidos'}"> aria-current="page"</c:if>>Meus pedidos</a>
+            <a class="navbar__link navbar__link--sair" href="${pageContext.request.contextPath}/logout">Sair</a>
+        </nav>
+    </div>
+</header>
