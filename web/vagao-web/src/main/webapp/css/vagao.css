@@ -12,7 +12,8 @@
    5. Componentes: faixa, wordmark, placa, trilho, botões, campos,
       alertas, status de pedido, seta de voltar, navbar, rodapé,
       card de produto, estado vazio
-   6. Páginas: estrutura do cliente, login, área do cliente, catálogo
+   6. Páginas: estrutura do cliente, login, área do cliente, catálogo,
+      detalhe do produto
    7. Movimento reduzido
    ========================================================================== */
 
@@ -881,6 +882,93 @@ input { caret-color: var(--vermelho); }
     /* Alterna: colunas pares mais baixas, mesmo deslocamento em todas as linhas.
        Só com 4 colunas (em 3 viraria tabuleiro). As bases de cada linha seguem alinhadas. */
     .catalogo__item:nth-child(even) { margin-top: var(--esp-6); }
+}
+
+
+/* --- Detalhe do produto (cliente/catalogo/detalhe.jsp) -----------------------------
+   Mobile: foto e informações empilhadas. >= 900px: duas colunas.
+   A foto reaproveita as partes .produto__midia/__inicial/__foto do card. */
+.detalhe {
+    width: 100%;
+    max-width: 74rem;
+    margin-inline: auto;
+    padding: var(--esp-5) var(--esp-4) var(--esp-8);
+}
+.detalhe > .voltar { margin-bottom: var(--esp-5); min-height: 2.75rem; }
+.detalhe > .alerta { margin-bottom: var(--esp-5); }
+
+.detalhe__grade { display: grid; gap: var(--esp-6); align-items: start; }
+
+.detalhe__midia {
+    max-width: 30rem;                   /* empilhado: a foto não vira um poste em tablet */
+    border: var(--borda);
+    box-shadow: var(--sombra-lg);
+}
+.detalhe__midia .produto__midia { border-bottom: 0; }
+.detalhe__midia .produto__inicial { font-size: clamp(5rem, 22vw, 9rem); }
+
+.detalhe__info { display: grid; gap: var(--esp-4); min-width: 0; }
+.detalhe__categoria {
+    color: var(--apoio);
+    font-family: var(--fonte-mono);
+    font-size: var(--t-xs);
+    letter-spacing: var(--tracking-label);
+    text-transform: uppercase;
+}
+.detalhe__nome {
+    margin-top: calc(-1 * var(--esp-2));
+    font-size: var(--t-xl);
+    font-weight: 700;
+    line-height: 1.1;
+    overflow-wrap: anywhere;
+    text-wrap: balance;
+}
+.detalhe__preco {
+    color: var(--vermelho);             /* 6.56 sobre papel */
+    font-family: var(--fonte-mono);
+    font-size: var(--t-lg);
+    font-weight: 700;
+    font-variant-numeric: tabular-nums;
+}
+.detalhe__descricao {
+    max-width: 65ch;
+    line-height: 1.6;
+    overflow-wrap: anywhere;
+}
+
+/* Caixa de compra: placa + estoque + formulário */
+.detalhe__compra { box-shadow: var(--sombra); margin-top: var(--esp-2); }
+.detalhe__compra-corpo { display: grid; gap: var(--esp-4); padding: var(--esp-5); }
+.detalhe__estoque {
+    font-family: var(--fonte-mono);
+    font-size: var(--t-sm);
+    line-height: 1.5;
+}
+.detalhe__estoque-rotulo {
+    font-weight: 700;
+    letter-spacing: var(--tracking-label);
+    text-transform: uppercase;
+}
+.detalhe__form {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: flex-end;
+    gap: var(--esp-4);
+}
+.detalhe__form .campo { width: 7rem; }
+.detalhe__form .btn { flex: 1 1 10rem; }
+
+@media (min-width: 640px) {
+    .detalhe { padding-inline: var(--esp-6); }
+    .detalhe__compra-corpo { padding: var(--esp-6); }
+}
+@media (min-width: 900px) {
+    .detalhe__grade {
+        grid-template-columns: minmax(0, 5fr) minmax(0, 6fr);
+        gap: var(--esp-8);
+    }
+    .detalhe__midia { max-width: none; }
+    .detalhe__nome { font-size: clamp(2rem, 3.2vw, 2.75rem); }
 }
 
 
